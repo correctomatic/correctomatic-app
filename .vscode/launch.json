@@ -21,14 +21,16 @@
       "type": "debugpy",
       "request": "launch",
       "module": "flask",
+      "envFile": "${workspaceFolder}/.env",
       "env": {
           "FLASK_APP": "app.py",
-          "FLASK_DEBUG": "1"
+          "FLASK_DEBUG": "1",
       },
       "args": [
           "run",
           "--no-debugger",
-          "--no-reload"
+          "--no-reload",
+          "--port", "5000"
       ],
       "jinja": true,
       "justMyCode": true

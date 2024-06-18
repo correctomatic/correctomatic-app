@@ -41,6 +41,25 @@ def index():
         last_submission_pending=last_submission_pending
         )
 
+import requests
+def banana(submission_id, filename):
+    # Simulate the curl request internally
+    payload = {
+        'file': (filename, open(os.path.join(current_app.config['UPLOAD_FOLDER'], filename), 'rb')),
+        'work_id': 'my-id-for-exercise 8888',
+        'assignment_id': 'correction-test-1',
+        'callback': 'http://host.docker.internal:3333/log' + '/correctomatic-response'
+    }
+    headers = {
+        'User-Agent': 'insomnium/0.2.3-a',
+    }
+    response = requests.post('http://localhost:8080/grade', files=payload, headers=headers)
+
+    # Check the response from the simulated request
+    if response.status_code != 200:
+        # Handle the error as needed
+        return f"Error: {response.status_code} - {response.text}", 500
+
 @bp.route('/new_submission', methods=['POST'])
 def new_submission():
     current_user = get_current_user()

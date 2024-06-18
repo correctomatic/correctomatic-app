@@ -1,22 +1,25 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from .extensions import db
+from .extensions import db, get_connection_string
 
 def create_app():
+    port = os.getenv('PORT', 5000)
     app = Flask(__name__)
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost/correctomatic'
+    app.config['SQLALCHEMY_DATABASE_URI'] = get_connection_string()
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+    app.config['CALLBACK_HOST'] = os.getenv('CALLBACK_HOST', 'http://localhost:5000')
 
     db.init_app(app)
 
     with app.app_context():
-        from .routes import home, submissions
+        from .routes import home, submissions, correctomatic
 
         # Register Blueprints
         app.register_blueprint(home.bp)
         app.register_blueprint(submissions.bp)
+        app.register_blueprint(correctomatic.bp)
 
         return app
