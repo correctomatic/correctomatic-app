@@ -1,19 +1,23 @@
 from datetime import datetime
 import os
-from flask import Blueprint, render_template, request, redirect, url_for, current_app
-from flask_sqlalchemy import SQLAlchemy
+import uuid
 from werkzeug.utils import secure_filename
+from flask import Blueprint, render_template, request, redirect, url_for, current_app
 
-db = SQLAlchemy()
-
+from ..extensions import db
 from ..models import Submission
 
 bp = Blueprint('submissions', __name__)
 
 @bp.route('/submissions')
-def index():
+def submissions():
     submissions = Submission.query.all()
-    return render_template('index.html', submissions=submissions)
+    return render_template('submissions.html', submissions=submissions)
+
+def unique_filename(filename):
+    unique_id = uuid.uuid4().hex
+    filename = secure_filename(filename)
+    return f"{unique_id}_{filename}"
 
 @bp.route('/new_submission', methods=['POST'])
 def new_submission():
@@ -26,7 +30,7 @@ def new_submission():
         return redirect(request.url)
 
     if file:
-        filename = secure_filename(file.filename)
+        filename = unique_filename(file.filename)
         file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
 
         new_entry = Submission(
@@ -39,4 +43,4 @@ def new_submission():
         db.session.add(new_entry)
         db.session.commit()
 
-    return redirect(url_for('submissions'))
+    return redirect(url_for('submissions.submissions'))

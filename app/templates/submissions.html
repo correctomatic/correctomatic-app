@@ -26,7 +26,8 @@
 </head>
 <body>
     <h1>Submissions</h1>
-    <form action="/new_submission" method="post">
+    <form action="/new_submission" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
         <button type="submit">New submission...</button>
     </form>
     <br>
