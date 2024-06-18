@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submissions</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .toggle-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Submissions</h1>
+    <form action="/new_submission" method="post">
+        <button type="submit">New submission...</button>
+    </form>
+    <br>
+    <table>
+        <tr>
+            <th>Started</th>
+            <th>Status</th>
+            <th>Grade</th>
+            <th>Actions</th>
+        </tr>
+        {% for submission in submissions %}
+        <tr>
+            <td>{{ submission.started }}</td>
+            <td>{{ submission.status }}</td>
+            <td>{{ submission.grade }}</td>
+            <td>
+                <button type="button" onclick="toggleContent('comments', {{ submission.id }})">
+                    Show comments
+                </button>
+                <button type="button" onclick="toggleContent('errors', {{ submission.id }})">
+                    Show errors
+                </button>
+            </td>
+        </tr>
+        <tr id="comments-{{ submission.id }}" class="toggle-content">
+            <td colspan="4">{{ submission.comments }}</td>
+        </tr>
+        <tr id="errors-{{ submission.id }}" class="toggle-content">
+            <td colspan="4">{{ submission.errors }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        function toggleContent(type, id) {
+            const element = document.getElementById(`${type}-${id}`);
+            if (element.style.display === 'none' || element.style.display === '') {
+                element.style.display = 'table-row';
+            } else {
+                element.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
