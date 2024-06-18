@@ -25,12 +25,15 @@
     </style>
 </head>
 <body>
-    <h1>Submissions</h1>
+
+    {% if not last_submission_pending %}
     <form action="/new_submission" method="post" enctype="multipart/form-data">
         <input type="file" name="file" required>
         <button type="submit">New submission...</button>
     </form>
+    {% endif %}
     <br>
+    <h1>Submissions</h1>
     <table>
         <tr>
             <th>Started</th>
@@ -40,23 +43,32 @@
         </tr>
         {% for submission in submissions %}
         <tr>
-            <td>{{ submission.started }}</td>
+            <td>{{ submission.started.strftime('%d/%m/%y %H:%M:%S') }}</td>
             <td>{{ submission.status }}</td>
             <td>{{ submission.grade }}</td>
             <td>
+                {% if submission.comments %}
                 <button type="button" onclick="toggleContent('comments', {{ submission.id }})">
                     Show comments
                 </button>
+                {% endif %}
+                {% if submission.errors %}
                 <button type="button" onclick="toggleContent('errors', {{ submission.id }})">
                     Show errors
                 </button>
+                {% endif %}
+                <a href="{{ url_for('submissions.download_file', submission_id=submission.id) }}">
+                    <button type="button">
+                        Download file
+                    </button>
+                </a>
             </td>
         </tr>
         <tr id="comments-{{ submission.id }}" class="toggle-content">
-            <td colspan="4">{{ submission.comments }}</td>
+            <td colspan="4">{{ submission.comments |nl2br |safe }}</td>
         </tr>
         <tr id="errors-{{ submission.id }}" class="toggle-content">
-            <td colspan="4">{{ submission.errors }}</td>
+            <td colspan="4">{{ submission.errors |nl2br |safe }}</td>
         </tr>
         {% endfor %}
     </table>

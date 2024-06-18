@@ -2,25 +2,58 @@ from datetime import datetime
 import os
 import uuid
 from werkzeug.utils import secure_filename
-from flask import Blueprint, render_template, request, redirect, url_for, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, current_app, send_from_directory
 
 from ..extensions import db
 from ..models import Submission
 
 bp = Blueprint('submissions', __name__)
 
-@bp.route('/submissions')
-def submissions():
-    submissions = Submission.query.all()
-    return render_template('submissions.html', submissions=submissions)
+def get_current_user():
+    # Placeholder function. Replace with actual logic to get the current user.
+    return "current_user"
 
 def unique_filename(filename):
     unique_id = uuid.uuid4().hex
     filename = secure_filename(filename)
     return f"{unique_id}_{filename}"
 
+# Define a custom Jinja2 filter
+@current_app.template_filter('nl2br')
+def nl2br(value):
+    """Convert newlines to <br> tags."""
+    return value.replace('\n', '<br>')
+
+@bp.route('/submissions')
+def index():
+    current_user = get_current_user()
+    submissions = (Submission.query
+        .filter_by(user_id=current_user)
+        .order_by(Submission.started.desc())
+        .all()
+        )
+    last_submission = submissions[0] if submissions else None
+    last_submission_pending = last_submission and last_submission.status == 'Pending'
+
+    return render_template(
+        'submissions.html',
+        submissions=submissions,
+        last_submission_pending=last_submission_pending
+        )
+
 @bp.route('/new_submission', methods=['POST'])
 def new_submission():
+    current_user = get_current_user()
+
+    # Check if the last submission is still pending
+    last_submission = (
+        Submission.query
+          .filter_by(user_id=current_user)
+          .order_by(Submission.started.desc()).first()
+        )
+    if last_submission and last_submission.status == 'Pending':
+        return redirect(url_for('submissions.index'))
+
     if 'file' not in request.files:
         return redirect(request.url)
 
@@ -34,6 +67,7 @@ def new_submission():
         file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
 
         new_entry = Submission(
+            user_id=current_user,
             started=datetime.now(),
             status='Pending',
             comments='',
@@ -43,4 +77,14 @@ def new_submission():
         db.session.add(new_entry)
         db.session.commit()
 
-    return redirect(url_for('submissions.submissions'))
+    return redirect(url_for('submissions.index'))
+
+@bp.route('/download/<int:submission_id>')
+def download_file(submission_id):
+    current_user = get_current_user()
+    submission = Submission.query.get_or_404(submission_id)
+
+    if submission.user_id != current_user:
+        return redirect(url_for('submissions.index'))
+
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], submission.filename, as_attachment=True)
