@@ -42,18 +42,23 @@ def index():
         )
 
 import requests
-def banana(submission_id, filename):
+def banana(assignment_id, submission_id, filename):
+
+    print(f"Calling banana function with assignment_id={assignment_id}, submission_id={submission_id}, filename={filename}")
+
+    callback_host = current_app.config['CALLBACK_HOST']
     # Simulate the curl request internally
     payload = {
         'file': (filename, open(os.path.join(current_app.config['UPLOAD_FOLDER'], filename), 'rb')),
-        'work_id': 'my-id-for-exercise 8888',
-        'assignment_id': 'correction-test-1',
-        'callback': 'http://host.docker.internal:3333/log' + '/correctomatic-response'
+        'work_id': submission_id,
+        'assignment_id': assignment_id, # 'correction-test-1',
+        'callback': f'{callback_host}' + '/correctomatic-response'
     }
-    headers = {
-        'User-Agent': 'insomnium/0.2.3-a',
-    }
-    response = requests.post('http://localhost:8080/grade', files=payload, headers=headers)
+
+    # This is not working:
+    # api-1                       | [11:55:27.141] DEBUG (1): Job data: work_id=undefined, assignment_id=undefined, callback=undefined
+
+    response = requests.post('http://localhost:8080/grade', files=payload)
 
     # Check the response from the simulated request
     if response.status_code != 200:
@@ -70,7 +75,7 @@ def new_submission():
           .filter_by(user_id=current_user)
           .order_by(Submission.started.desc()).first()
         )
-    if last_submission and last_submission.status == 'Pending':
+    if last_submission and last_submission.status == 'Pending' and False:
         return redirect(url_for('submissions.index'))
 
     if 'file' not in request.files:
@@ -78,23 +83,42 @@ def new_submission():
 
     file = request.files['file']
 
+
     if file.filename == '':
         return redirect(request.url)
 
-    if file:
-        filename = unique_filename(file.filename)
-        file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+    if not file:
+        return redirect(request.url)
 
-        new_entry = Submission(
-            user_id=current_user,
-            started=datetime.now(),
-            status='Pending',
-            comments='',
-            errors='',
-            filename=filename
-        )
-        db.session.add(new_entry)
+    filename = unique_filename(file.filename)
+    file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+
+    new_entry = Submission(
+        user_id=current_user,
+        started=datetime.now(),
+        status='Pending',
+        comments='',
+        errors='',
+        filename=filename
+    )
+    db.session.add(new_entry)
+
+    try:
+        # Need to commit the transaction before calling the function
+        # to get the new entry ID
         db.session.commit()
+
+        banana('correction-test-1', new_entry.id, filename)
+
+    except Exception as e:
+        # If banana fails, log the error (optional) and roll back the transaction
+        db.session.delete(new_entry)
+        # Log the error or handle it as needed
+        print(f"Error calling banana function: {e}")
+        # Optionally, delete the uploaded file
+        os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+        # Return an error message to the user
+        return "An error occurred during submission. Please try again later.", 500
 
     return redirect(url_for('submissions.index'))
 
