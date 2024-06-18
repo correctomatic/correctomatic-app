@@ -43,27 +43,34 @@ def index():
 
 import requests
 def banana(assignment_id, submission_id, filename):
-
     print(f"Calling banana function with assignment_id={assignment_id}, submission_id={submission_id}, filename={filename}")
 
     callback_host = current_app.config['CALLBACK_HOST']
-    # Simulate the curl request internally
-    payload = {
-        'file': (filename, open(os.path.join(current_app.config['UPLOAD_FOLDER'], filename), 'rb')),
-        'work_id': submission_id,
-        'assignment_id': assignment_id, # 'correction-test-1',
-        'callback': f'{callback_host}' + '/correctomatic-response'
-    }
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    file_path = os.path.join(upload_folder, filename)
 
-    # This is not working:
-    # api-1                       | [11:55:27.141] DEBUG (1): Job data: work_id=undefined, assignment_id=undefined, callback=undefined
+    # Ensure the file exists before making the request
+    if not os.path.exists(file_path):
+        return f"Error: File {filename} does not exist", 400
 
-    response = requests.post('http://localhost:8080/grade', files=payload)
+    with open(file_path, 'rb') as file:
+        files = {
+            'file': (filename, file),
+        }
+        data = {
+            'work_id': submission_id,
+            'assignment_id': assignment_id,
+            'callback': f'{callback_host}/correctomatic-response'
+        }
 
-    # Check the response from the simulated request
+        response = requests.post('http://localhost:8080/grade', files=files, data=data)
+
+    # Check the response from the request
     if response.status_code != 200:
         # Handle the error as needed
         return f"Error: {response.status_code} - {response.text}", 500
+
+    return response.json(), 200
 
 @bp.route('/new_submission', methods=['POST'])
 def new_submission():
