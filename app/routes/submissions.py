@@ -38,7 +38,8 @@ def index():
     return render_template(
         'submissions.jinja2',
         submissions=submissions,
-        last_submission_pending=last_submission_pending
+        last_submission_pending=last_submission_pending,
+        container=current_app.config['DEFAULT_CONTAINER']
         )
 
 import requests
@@ -120,7 +121,8 @@ def new_submission():
         # to get the new entry ID
         db.session.commit()
 
-        send_correction_request('correction-test-1', new_entry.id, filename)
+        container = request.form['container']
+        send_correction_request(container, new_entry.id, filename)
 
     except Exception as e:
         # If banana fails, log the error (optional) and roll back the transaction

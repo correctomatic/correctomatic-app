@@ -30,6 +30,7 @@
     <form action="/new_submission" method="post" enctype="multipart/form-data">
         <input type="file" name="file" required>
         <button type="submit">New submission...</button>
+        <input type="text" name="container" placeholder="Container name" value="{{ container }}" required>
     </form>
     {% endif %}
     <br>
