@@ -69,7 +69,7 @@ def send_correction_request(assignment_id, submission_id, filename):
     # Check the response from the request
     if response.status_code != 200:
         # Handle the error as needed
-        raise f"Error: {response.status_code} - {response.text}", 500
+        raise f'Error: {response.status_code} - {response.text}'
 
     response_data = response.json()
     if not response_data.get("success"):

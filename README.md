@@ -16,3 +16,11 @@ flask run --debugger --reload
 
 Interesant things to check:
 - [Custom commands](https://flask.palletsprojects.com/en/3.0.x/cli/#custom-commands)
+
+```sh
+flask shell
+
+from app import create_app
+app = create_app()
+app.url_map
+```

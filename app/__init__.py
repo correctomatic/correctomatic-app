@@ -1,10 +1,8 @@
 import os
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from .extensions import db, get_connection_string
 
 def create_app():
-    port = os.getenv('PORT', 5000)
     app = Flask(__name__)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = get_connection_string()
@@ -24,11 +22,11 @@ def create_app():
     db.init_app(app)
 
     with app.app_context():
-        from .routes import home, submissions, correctomatic
+        from .routes import home, submissions, responses
 
         # Register Blueprints
         app.register_blueprint(home.bp)
         app.register_blueprint(submissions.bp)
-        app.register_blueprint(correctomatic.bp)
+        app.register_blueprint(responses.bp)
 
         return app
