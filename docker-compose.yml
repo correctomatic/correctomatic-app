@@ -24,7 +24,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: correctomatic
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./postgres-data:/docker-entrypoint-initdb.d/

@@ -42,11 +42,12 @@ def index():
         )
 
 import requests
-def banana(assignment_id, submission_id, filename):
+def send_correction_request(assignment_id, submission_id, filename):
     print(f"Calling banana function with assignment_id={assignment_id}, submission_id={submission_id}, filename={filename}")
 
     callback_host = current_app.config['CALLBACK_HOST']
     upload_folder = current_app.config['UPLOAD_FOLDER']
+    api_server = current_app.config['CORRECTOMATIC_API_SERVER']
     file_path = os.path.join(upload_folder, filename)
 
     # Ensure the file exists before making the request
@@ -63,14 +64,18 @@ def banana(assignment_id, submission_id, filename):
             'callback': f'{callback_host}/correctomatic-response'
         }
 
-        response = requests.post('http://localhost:8080/grade', files=files, data=data)
+        response = requests.post(f'{api_server}/grade', files=files, data=data)
 
     # Check the response from the request
     if response.status_code != 200:
         # Handle the error as needed
-        return f"Error: {response.status_code} - {response.text}", 500
+        raise f"Error: {response.status_code} - {response.text}", 500
 
-    return response.json(), 200
+    response_data = response.json()
+    if not response_data.get("success"):
+        raise f'error: {response_data.get("message", "Unknown error occurred")}'
+
+    return True
 
 @bp.route('/new_submission', methods=['POST'])
 def new_submission():
@@ -115,13 +120,13 @@ def new_submission():
         # to get the new entry ID
         db.session.commit()
 
-        banana('correction-test-1', new_entry.id, filename)
+        send_correction_request('correction-test-1', new_entry.id, filename)
 
     except Exception as e:
         # If banana fails, log the error (optional) and roll back the transaction
         db.session.delete(new_entry)
         # Log the error or handle it as needed
-        print(f"Error calling banana function: {e}")
+        print(f"Error sending correction to correctomatic: {e}")
         # Optionally, delete the uploaded file
         os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
         # Return an error message to the user
