@@ -30,7 +30,8 @@
           "run",
           "--no-debugger",
           "--no-reload",
-          "--port", "5000"
+          "--port", "5000",
+          "--host", "0.0.0.0"
       ],
       "jinja": true,
       "justMyCode": true

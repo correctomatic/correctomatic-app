@@ -4,9 +4,10 @@ pip install debugpy python-dotenv
 
 
 ## Run the app in development mode
+Very important: listen on all hosts, so correctomatic notifier can access this app:
 
 ```bash
-flask run --debugger --reload
+flask run --debugger --reload --host=0.0.0.0
 ```
 
 - `.env` contents are loaded automatically by Flask when the app is run in development mode.
