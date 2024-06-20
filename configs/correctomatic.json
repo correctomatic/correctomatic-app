@@ -1,7 +1,7 @@
 {
   "http://moodle.lti": [{
     "default": true,
-    "client_id": "omwFNMbTxqqMpAP",
+    "client_id": "ZHD2HCuDCNrSEkG",
     "auth_login_url": "http://moodle.lti/mod/lti/auth.php",
     "auth_token_url": "http://moodle.lti/mod/lti/token.php",
     "auth_audience": null,

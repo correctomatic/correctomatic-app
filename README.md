@@ -3,6 +3,9 @@ pip install flask psycopg2-binary
 pip install debugpy python-dotenv
 
 
+**Super Interesting**:
+https://pypi.org/project/PyLTI1p3/
+
 ## Run the app in development mode
 Very important: listen on all hosts, so correctomatic notifier can access this app:
 

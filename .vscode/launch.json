@@ -29,7 +29,7 @@
       "args": [
           "run",
           "--no-debugger",
-          "--no-reload",
+          // "--no-reload",
           "--port", "5000",
           "--host", "0.0.0.0"
       ],

@@ -2,10 +2,27 @@ from datetime import datetime
 import os
 import uuid
 from werkzeug.utils import secure_filename
-from flask import Blueprint, render_template, request, redirect, url_for, current_app, send_from_directory
+from flask import (
+    Blueprint, render_template,
+    request, redirect, url_for,
+    current_app, send_from_directory,
+    session
+)
 
 from ..extensions import db
 from ..models import Submission
+
+from ..lti_lib import (
+    lti_tool_conf,
+    lti_launch_data_storage,
+    lti_config_dir
+)
+from pylti1p3.contrib.flask import (
+    FlaskOIDCLogin,
+    FlaskMessageLaunch,
+    FlaskRequest,
+    FlaskCacheDataStorage,
+)
 
 bp = Blueprint('submissions', __name__)
 
@@ -30,6 +47,17 @@ def olakase():
 
 @bp.route('/submissions', methods=["GET", "POST"])
 def index():
+
+    tool_conf = lti_tool_conf()
+    flask_request = FlaskRequest()
+    launch_data_storage = lti_launch_data_storage()
+
+    launch_id = session.get('launch_id')
+    message_launch = FlaskMessageLaunch.from_cache(
+        launch_id, flask_request, tool_conf,
+        launch_data_storage=launch_data_storage
+    )
+
     current_user = get_current_user()
     submissions = (Submission.query
         .filter_by(user_id=current_user)
