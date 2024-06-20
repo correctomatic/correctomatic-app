@@ -1,6 +1,6 @@
 import os
 from jwcrypto import jwk
-from flask import Blueprint, request, url_for, redirect
+from flask import Blueprint, url_for, redirect, session, jsonify
 from ..lti_lib import (
     lti_tool_conf,
     lti_launch_data_storage,
@@ -51,9 +51,18 @@ def launch():
         tool_config=lti_tool_conf()
     )
 
+    # Still testing this part
     data = message_launch.get_launch_data()
-    return redirect(url_for("submissions.index"))
+    session['launch_data'] = data
+    print(f'Data from launch: {data}')
 
+    launch_id = message_launch.get_launch_id()
+    session['launch_id'] = launch_id
+
+    user = data.get("sub")
+    session['user'] = user
+
+    return redirect(url_for("submissions.index"))
 
 @bp.route("/jwks", methods=["GET"])
 def jwks():

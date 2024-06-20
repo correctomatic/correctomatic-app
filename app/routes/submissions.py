@@ -50,14 +50,17 @@ def index():
 
     tool_conf = lti_tool_conf()
     flask_request = FlaskRequest()
-    launch_data_storage = lti_launch_data_storage()
+    # launch_data_storage = lti_launch_data_storage()
 
     launch_id = session.get('launch_id')
+    print(f'launch_id in submissions: {launch_id}')
+
     message_launch = FlaskMessageLaunch.from_cache(
         launch_id, flask_request, tool_conf,
-        launch_data_storage=launch_data_storage
+        # launch_data_storage=launch_data_storage
     )
-
+    data = message_launch.get_launch_data()
+    print(data)
     current_user = get_current_user()
     submissions = (Submission.query
         .filter_by(user_id=current_user)
