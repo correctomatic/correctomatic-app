@@ -8,6 +8,9 @@ bp = Blueprint("correctomatic", __name__)
 # Endpoint to receive Correctomatic responses
 @bp.route("/correctomatic-response", methods=["POST"])
 def correctomatic_response():
+    is_json = request.is_json
+    if not is_json: return jsonify({"message": "Invalid JSON payload"}), 400
+    
     data = request.get_json()
 
     # Extract relevant fields from the JSON payload
