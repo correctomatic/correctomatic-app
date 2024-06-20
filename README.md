@@ -1,3 +1,23 @@
+## Moodle configuration
+
+
+- Tool URL: http://app.host.lti:5000/launch
+- LTI version: 1.3
+- Public key type: Keyset URL
+- Public key URL: http://app.host.lti:5000/jwks
+- Initiate login URL: http://app.host.lti:5000/login
+- Redirect URI(s):
+  - http://app.host.lti:5000/launch
+  - http://app.host.lti:5000/submissions
+
+Run app:
+```bash
+flask run --debugger --reload --host=0.0.0.0
+```
+
+## Developer notes
+
+
 python -m venv .venv
 pip install flask psycopg2-binary
 pip install debugpy python-dotenv

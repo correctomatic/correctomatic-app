@@ -10,5 +10,29 @@
     "private_key_file": "private.key",
     "public_key_file": "public.key",
     "deployment_ids": ["1","2"]
+  }],
+  "https://aules.edu.gva.es/docent":[{
+    "default": true,
+    "client_id": "rFQZfRCMVipPH6v",
+    "auth_login_url": "https://aules.edu.gva.es/docent/mod/lti/auth.php",
+    "auth_token_url": "https://aules.edu.gva.es/docent/mod/lti/token.php",
+    "auth_audience": null,
+    "key_set_url": "https://aules.edu.gva.es/docent/mod/lti/certs.php",
+    "key_set": null,
+    "private_key_file": "private.key",
+    "public_key_file": "public.key",
+    "deployment_ids": ["169"]
+  }],
+  "https://aules.edu.gva.es/ed": [{
+    "default": true,
+    "client_id": "vUktVZGUdUE3k8O",
+    "auth_login_url": "https://aules.edu.gva.es/ed/mod/lti/auth.php",
+    "auth_token_url": "https://aules.edu.gva.es/ed/mod/lti/token.php",
+    "auth_audience": null,
+    "key_set_url": "https://aules.edu.gva.es/ed/mod/lti/certs.php",
+    "key_set": null,
+    "private_key_file": "private.key",
+    "public_key_file": "public.key",
+    "deployment_ids": ["2"]
   }]
 }

@@ -35,7 +35,9 @@ def unique_filename(filename):
 @current_app.template_filter('nl2br')
 def nl2br(value):
     """Convert newlines to <br> tags."""
-    return value.replace('\n', '<br>')
+    if value is None:
+        return ''
+    return str(value).replace('\n', '<br>')
 
 def get_current_user():
 
