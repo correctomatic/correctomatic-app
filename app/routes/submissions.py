@@ -24,7 +24,11 @@ def nl2br(value):
     """Convert newlines to <br> tags."""
     return value.replace('\n', '<br>')
 
-@bp.route('/submissions')
+@bp.route('/OLAKASE', methods=["GET", "POST"])
+def olakase():
+    return 'OLA K ASE'
+
+@bp.route('/submissions', methods=["GET", "POST"])
 def index():
     current_user = get_current_user()
     submissions = (Submission.query

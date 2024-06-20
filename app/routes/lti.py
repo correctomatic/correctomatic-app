@@ -12,8 +12,8 @@ from pylti1p3.tool_config import ToolConfJsonFile
 
 bp = Blueprint("lti", __name__)
 
-def get_lti_config_path():
-    return os.path.join(current_app.root_path, "configs", "reactquiz.json")
+def get_lti_config_dir():
+    return os.path.join(current_app.root_path, "..", "configs")
 
 def get_launch_data_storage():
     cache = current_app.cache
@@ -21,7 +21,7 @@ def get_launch_data_storage():
 
 @bp.route("/login/", methods=["GET", "POST"])
 def login():
-    tool_conf = ToolConfJsonFile(get_lti_config_path())
+    tool_conf = ToolConfJsonFile(os.path.join(get_lti_config_dir(),"correctomatic.json"))
     launch_data_storage = get_launch_data_storage()
     flask_request = FlaskRequest()
 
@@ -40,7 +40,7 @@ def jwks():
     __location__ = os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__))
     )
-    public_key_path = os.path.join(__location__, "configs", "public.key")
+    public_key_path = os.path.join(get_lti_config_dir(), "public.key")
 
     with open(public_key_path, "rb") as public_key_file:
         public_key = public_key_file.read()
