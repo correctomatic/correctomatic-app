@@ -1,9 +1,11 @@
 import os
 from flask import Flask
+from flask_caching import Cache
 from .extensions import db, get_connection_string
 
 def create_app():
     app = Flask(__name__)
+    cache = Cache(app)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = get_connection_string()
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -23,11 +25,14 @@ def create_app():
     db.init_app(app)
 
     with app.app_context():
-        from .routes import home, submissions, responses
+        app.cache = cache
+        
+        from .routes import home, submissions, responses, lti
 
         # Register Blueprints
         app.register_blueprint(home.bp)
         app.register_blueprint(submissions.bp)
         app.register_blueprint(responses.bp)
+        app.register_blueprint(lti.bp)
 
         return app

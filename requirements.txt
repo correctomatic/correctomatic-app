@@ -4,3 +4,5 @@ debugpy
 python-dotenv
 flask_sqlalchemy
 requests
+pylti1p3
+flask_caching
