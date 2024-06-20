@@ -26,10 +26,6 @@ from pylti1p3.contrib.flask import (
 
 bp = Blueprint('submissions', __name__)
 
-def get_current_user():
-    # Placeholder function. Replace with actual logic to get the current user.
-    return "current_user"
-
 def unique_filename(filename):
     unique_id = uuid.uuid4().hex
     filename = secure_filename(filename)
@@ -41,12 +37,7 @@ def nl2br(value):
     """Convert newlines to <br> tags."""
     return value.replace('\n', '<br>')
 
-@bp.route('/OLAKASE', methods=["GET", "POST"])
-def olakase():
-    return 'OLA K ASE'
-
-@bp.route('/submissions', methods=["GET", "POST"])
-def index():
+def get_current_user():
 
     tool_conf = lti_tool_conf()
     flask_request = FlaskRequest()
@@ -61,6 +52,15 @@ def index():
     )
     data = message_launch.get_launch_data()
     print(data)
+    return data.get("sub")
+
+    # Placeholder function. Replace with actual logic to get the current user.
+    return "current_user"
+
+
+@bp.route('/submissions', methods=["GET", "POST"])
+def index():
+
     current_user = get_current_user()
     submissions = (Submission.query
         .filter_by(user_id=current_user)
