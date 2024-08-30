@@ -1,23 +1,27 @@
-# Use the official Python image from the Docker Hub
-FROM python:3.9-slim
+ARG PYTHON_VERSION=3.11
+FROM python:${PYTHON_VERSION}-slim
 
-# Set the working directory
+# Ensure Python output is sent straight to terminal (e.g., for Docker logs)
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
-# Copy the requirements file into the container
-COPY requirements.txt .
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install any dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir --no-compile -r requirements.txt
 
-# Copy the rest of the application code
-COPY . .
+COPY app.py /app/
+COPY app /app/app
 
-# Make port 5000 available to the world outside this container
-EXPOSE 5000
-# Make port 5678 available for debugging
-EXPOSE 5678
+# Precompile Python files
+RUN python -m compileall .
 
-# Run the application
-CMD ["python", "app.py"]
+# 7. Expose the port (optional, depending on the application)
+# EXPOSE 8000  # Uncomment if you're running a web server
 
+# 8. Run the application (use a more specific command for your app)
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000", "--workers", "4"]

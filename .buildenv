@@ -1,0 +1,7 @@
+# This .env file is used to store environment variables for the build process
+# NOT for configuring the container at runtime
+DOCKERHUB_USER=correctomatic
+IMAGE_NAME=app
+IMAGE_TAG=0.0.1
+
+PYTHON_VERSION=3.11
