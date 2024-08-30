@@ -7,7 +7,10 @@ from .extensions import db, get_connection_string
 
 def create_app():
     app = Flask(__name__)
-    cache = Cache(app)
+
+    # Set up caching configuration
+    app.config['CACHE_TYPE'] = 'simple'  # or 'filesystem', 'redis', 'memcached', etc.
+    app.config['CACHE_DEFAULT_TIMEOUT'] = 300  # Optional: set default cache timeout (in seconds)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = get_connection_string()
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -16,7 +19,7 @@ def create_app():
     app.config['CORRECTOMATIC_API_SERVER'] = os.getenv('CORRECTOMATIC_API_SERVER')
     app.config['DEFAULT_CONTAINER'] = os.getenv('DEFAULT_CONTAINER', 'correction-test-1')
     app.secret_key = os.getenv('FLASK_SECRET_KEY')
-    
+
     # Validations before running the app
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         raise ValueError(f"Upload folder {app.config['UPLOAD_FOLDER']} does not exist")
@@ -24,6 +27,9 @@ def create_app():
         raise ValueError("Environment variable 'CALLBACK_HOST' is required")
     if not app.config['CORRECTOMATIC_API_SERVER']:
         raise ValueError("Environment variable 'CORRECTOMATIC_API_SERVER' is required")
+
+    # Must be done after setting up the configuration
+    cache = Cache(app)
 
     db.init_app(app)
 

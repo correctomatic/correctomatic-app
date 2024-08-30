@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir --no-compile -r requirements.txt
 
-COPY app.py /app/
+COPY wsgi.py /app/
 COPY app /app/app
 
 # Precompile Python files
@@ -24,4 +24,4 @@ RUN python -m compileall .
 # EXPOSE 8000  # Uncomment if you're running a web server
 
 # 8. Run the application (use a more specific command for your app)
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000", "--workers", "4"]
+CMD ["gunicorn", "wsgi:app", "--bind", "0.0.0.0:8000", "--workers", "4"]
