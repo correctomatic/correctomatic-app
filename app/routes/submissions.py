@@ -2,16 +2,29 @@ from datetime import datetime
 import os
 import uuid
 from werkzeug.utils import secure_filename
-from flask import Blueprint, render_template, request, redirect, url_for, current_app, send_from_directory
+from flask import (
+    Blueprint, render_template,
+    request, redirect, url_for,
+    current_app, send_from_directory,
+    session
+)
 
 from ..extensions import db
 from ..models import Submission
 
-bp = Blueprint('submissions', __name__)
+from ..lti_lib import (
+    lti_tool_conf,
+    lti_launch_data_storage,
+    lti_config_dir
+)
+from pylti1p3.contrib.flask import (
+    FlaskOIDCLogin,
+    FlaskMessageLaunch,
+    FlaskRequest,
+    FlaskCacheDataStorage,
+)
 
-def get_current_user():
-    # Placeholder function. Replace with actual logic to get the current user.
-    return "current_user"
+bp = Blueprint('submissions', __name__)
 
 def unique_filename(filename):
     unique_id = uuid.uuid4().hex
@@ -22,10 +35,34 @@ def unique_filename(filename):
 @current_app.template_filter('nl2br')
 def nl2br(value):
     """Convert newlines to <br> tags."""
-    return value.replace('\n', '<br>')
+    if value is None:
+        return ''
+    return str(value).replace('\n', '<br>')
 
-@bp.route('/submissions')
+def get_current_user():
+
+    tool_conf = lti_tool_conf()
+    flask_request = FlaskRequest()
+    # launch_data_storage = lti_launch_data_storage()
+
+    launch_id = session.get('launch_id')
+    print(f'launch_id in submissions: {launch_id}')
+
+    message_launch = FlaskMessageLaunch.from_cache(
+        launch_id, flask_request, tool_conf,
+        # launch_data_storage=launch_data_storage
+    )
+    data = message_launch.get_launch_data()
+    print(data)
+    return data.get("sub")
+
+    # Placeholder function. Replace with actual logic to get the current user.
+    return "current_user"
+
+
+@bp.route('/submissions', methods=["GET", "POST"])
 def index():
+
     current_user = get_current_user()
     submissions = (Submission.query
         .filter_by(user_id=current_user)
