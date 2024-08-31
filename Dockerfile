@@ -4,6 +4,8 @@ FROM python:${PYTHON_VERSION}-slim
 ENV FLASK_ENV=production
 # Ensure Python output is sent straight to terminal (e.g., for Docker logs)
 ENV PYTHONUNBUFFERED=1
+ENV PORT=8000
+ENV WORKERS=4
 
 WORKDIR /app
 
@@ -21,8 +23,7 @@ COPY app /app/app
 # Precompile Python files
 RUN python -m compileall .
 
-# 7. Expose the port (optional, depending on the application)
-# EXPOSE 8000  # Uncomment if you're running a web server
+COPY entrypoint.sh /app/
+RUN chmod +x /app/entrypoint.sh
 
-# 8. Run the application (use a more specific command for your app)
-CMD ["gunicorn", "wsgi:app", "--bind", "0.0.0.0:5000", "--workers", "4"]
+CMD ["/app/entrypoint.sh"]
