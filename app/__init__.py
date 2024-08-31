@@ -24,7 +24,7 @@ def create_app():
 
     # Validations before running the app
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
-        raise ValueError(f"Upload folder {app.config['UPLOAD_FOLDER']} does not exist")
+        raise ValueError(f'Upload folder {app.config["UPLOAD_FOLDER"]} does not exist')
     if not app.config['CALLBACK_HOST']:
         raise ValueError("Environment variable 'CALLBACK_HOST' is required")
     if not app.config['CORRECTOMATIC_API_SERVER']:
