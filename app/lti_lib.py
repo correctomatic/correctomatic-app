@@ -9,7 +9,8 @@ from pylti1p3.contrib.flask import (
 from pylti1p3.tool_config import ToolConfJsonFile
 
 def lti_config_dir():
-    return os.path.join(current_app.root_path, "..", "configs")
+    default_config_dir = os.path.join(current_app.root_path, "..", "configs")
+    return os.getenv('LTI_CONFIG_DIR', default_config_dir)
 
 def lti_config_file():
     return os.path.join(lti_config_dir(), "correctomatic.json")

@@ -1,6 +1,7 @@
 ARG PYTHON_VERSION=3.11
 FROM python:${PYTHON_VERSION}-slim
 
+ENV FLASK_ENV=production
 # Ensure Python output is sent straight to terminal (e.g., for Docker logs)
 ENV PYTHONUNBUFFERED=1
 
@@ -24,4 +25,4 @@ RUN python -m compileall .
 # EXPOSE 8000  # Uncomment if you're running a web server
 
 # 8. Run the application (use a more specific command for your app)
-CMD ["gunicorn", "wsgi:app", "--bind", "0.0.0.0:8000", "--workers", "4"]
+CMD ["gunicorn", "wsgi:app", "--bind", "0.0.0.0:5000", "--workers", "4"]

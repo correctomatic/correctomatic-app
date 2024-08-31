@@ -30,6 +30,8 @@ You can build the container with the following command:
 ```
 To run the container, you need to set the following environment variables:
 
+- `FLASK_ENV`: `production` or `development`, defaults to `production`
+- `FLASK_SECRET_KEY`: secret key for the Flask app. It will initialize to a random value if not set.
 - `POSTGRES_USER`, `POSTGRES_PASSWORD`: database credentials
 - `POSTGRES_HOST`: database host, from the viewpoint of the app container. You can add the database host using the `--add-host` option when running the container.
 - `POSTGRES_PORT`: database port, defaults to 5432
@@ -37,6 +39,8 @@ To run the container, you need to set the following environment variables:
 - `CORRECTOMATIC_API_SERVER`: URL of the correctomatic API server from the viewpoint of the app container
 - `CALLBACK_HOST`: host and port of this app from the correctomatic viewpoint. You will probably need to set this to `http://host.docker.internal:5000` when running the app in a container.
 - `UPLOAD_FOLDER`: folder where uploaded files are stored. Correctomatic doesn't need access to this folder (it makes a copy of the file), so you can set it to any value.
+
+You will also need to mount the LTI configuration directory, with the correctomatic.json LTI configuration files and the private and public keys. Take in mind that the paths in the configuration file should be from the viewpoint of the app container.
 
 Example of running the container:
 ```bash
@@ -49,7 +53,9 @@ docker run --rm --name correctomatic-app \
     -e CORRECTOMATIC_API_SERVER=http://host.docker.internal:8080 \
     -e CALLBACK_HOST=http://host.docker.internal:5000 \
     -e UPLOAD_FOLDER=/uploads \
+    -e LTI_CONFIG_DIR=/lti_config \
     -v /path/to/uploads:/uploads \
+    -v /path/to/lti_config_dir:/lti_config \
     -p 5000:5000 \
     --add-host=host.docker.internal:host-gateway \
     correctomatic/app
