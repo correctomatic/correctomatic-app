@@ -7,6 +7,8 @@ ENV PYTHONUNBUFFERED=1
 ENV PORT=8000
 ENV WORKERS=4
 
+RUN adduser python
+
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -14,11 +16,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /app/
+COPY --chown=python:python requirements.txt /app/
 RUN pip install --no-cache-dir --no-compile -r requirements.txt
 
-COPY wsgi.py /app/
-COPY app /app/app
+COPY --chown=python:python wsgi.py /app/
+COPY --chown=python:python app /app/app
 
 # Precompile Python files
 RUN python -m compileall .
@@ -26,4 +28,5 @@ RUN python -m compileall .
 COPY entrypoint.sh /app/
 RUN chmod +x /app/entrypoint.sh
 
+USER python
 CMD ["/app/entrypoint.sh"]
