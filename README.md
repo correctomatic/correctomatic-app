@@ -15,6 +15,13 @@ Run app:
 flask run --debugger --reload --host=0.0.0.0
 ```
 
+4.3 -> En curso, en la administración -> más ->  Herramientas externas LTI
+
+extensiones / autentificación / Gestionar la autentificación -> habilitar LTI
+
+extensiones / Módulos de Actividad / Gestionar actividades?
+extensiones / Módulos de Actividad / Herramienta externa?
+
 ## Developer notes
 
 
