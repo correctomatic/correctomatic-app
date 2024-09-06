@@ -12,7 +12,7 @@
 
 Run app:
 ```bash
-flask run --debugger --reload --host=0.0.0.0
+flask run --debugger --debug --reload --host=0.0.0.0
 ```
 
 4.3 -> En curso, en la administración -> más ->  Herramientas externas LTI

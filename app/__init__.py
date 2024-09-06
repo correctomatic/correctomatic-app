@@ -1,14 +1,42 @@
 import os
+import logging
 from flask import Flask
 from flask_caching import Cache
 
 from .routes import lti_endpoints
 from .extensions import db, get_connection_string
 
+def set_log_level(app):
+    DEFAULT_LOG_LEVEL = 'WARNING'
+
+    if 'gunicorn' in os.environ.get('SERVER_SOFTWARE', ''):
+        gunicorn_logger = logging.getLogger('gunicorn.error')
+        app.logger.handlers = gunicorn_logger.handlers
+        app.logger.setLevel(gunicorn_logger.level)
+    else:
+        app.logger.setLevel(os.getenv('LOG_LEVEL', DEFAULT_LOG_LEVEL))
+
+    return app
+
 def create_app():
     app = Flask(__name__)
 
     app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24))
+    set_log_level(app)
+
+    # ----------------------------------------
+    # Debugging log level
+    # ----------------------------------------
+    current_log_level = app.logger.getEffectiveLevel()
+    log_level_name = logging.getLevelName(current_log_level)
+    app.logger.error(f"El nivel de registro actual es: {log_level_name}")
+
+    app.logger.debug('this is a DEBUG message')
+    app.logger.info('this is an INFO message')
+    app.logger.warning('this is a WARNING message')
+    app.logger.error('this is an ERROR message')
+    app.logger.critical('this is a CRITICAL message')
+    # ----------------------------------------
 
     # Set up caching configuration
     app.config['CACHE_TYPE'] = 'simple'  # or 'filesystem', 'redis', 'memcached', etc.

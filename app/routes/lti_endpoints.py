@@ -1,6 +1,6 @@
 import os
 from jwcrypto import jwk
-from flask import Blueprint, url_for, redirect, session, jsonify
+from flask import Blueprint, current_app, url_for, redirect, session, jsonify
 from ..lti_lib import (
     lti_tool_conf,
     lti_launch_data_storage,
@@ -66,6 +66,17 @@ def launch():
 
 @bp.route("/jwks", methods=["GET"])
 def jwks():
+
+    # ----------------------------------------
+    # Debugging log level
+    # ----------------------------------------
+    current_app.logger.debug('this is a DEBUG message (Route: /jwks)')
+    current_app.logger.info('this is an INFO message (Route: /jwks)')
+    current_app.logger.warning('this is a WARNING message (Route: /jwks)')
+    current_app.logger.error('this is an ERROR message (Route: /jwks)')
+    current_app.logger.critical('this is a CRITICAL message (Route: /jwks)')
+    # ----------------------------------------
+
     __location__ = os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__))
     )

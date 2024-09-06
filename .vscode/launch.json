@@ -25,6 +25,7 @@
       "env": {
           "FLASK_APP": "app.py",
           "FLASK_DEBUG": "1",
+          "LOG_LEVEL": "DEBUG"
       },
       "args": [
           "run",
