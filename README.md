@@ -169,3 +169,66 @@ The fields in an LTI 1.3 launch request contain various pieces of information re
 22. **https://purl.imsglobal.org/spec/lti/claim/message_type**: The type of LTI message (`LtiResourceLinkRequest`).
 
 These fields collectively provide the necessary context, user information, and security details required for an LTI tool to process the launch request and present the appropriate content to the user.
+
+
+## JS Tool
+https://github.com/Godmartinz/Node-LTI-1.3-library
+https://cvmcosta.me/ltijs/#/
+https://github.com/SanDiegoCodeSchool/lti-node-example
+
+
+
+### LTI configuration
+
+.venv/lib/python3.10/site-packages/pylti1p3/tool_config/__init__.py
+.venv/lib/python3.10/site-packages/pylti1p3/tool_config/dict.py
+
+It can be configured with a dictionary:
+
+```python
+# .venv/lib/python3.10/site-packages/pylti1p3/tool_config/dict.py
+"""
+json_data is a dict where each key is issuer and value is issuer's configuration.
+Configuration could be set in two formats:
+
+1. { ... "iss": { ... "client_id: "client" ... }, ... }
+In this case the library will work in the concept: one issuer ~ one client-id
+
+2. { ... "iss": [ { ... "client_id: "client1" ... }, { ... "client_id: "client2" ... } ], ... }
+In this case the library will work in concept: one issuer ~ many client-ids
+
+Example:
+    {
+        "iss1": [{
+                "default": True,
+                "client_id": "client_id1",
+                "auth_login_url": "auth_login_url1",
+                "auth_token_url": "auth_token_url1",
+                "auth_audience": None,
+                "key_set_url": "key_set_url1",
+                "key_set": None,
+                "deployment_ids": ["deployment_id1", "deployment_id2"]
+            }, {
+                "default": False,
+                "client_id": "client_id2",
+                "auth_login_url": "auth_login_url2",
+                "auth_token_url": "auth_token_url2",
+                "auth_audience": None,
+                "key_set_url": "key_set_url2",
+                "key_set": None,
+                "deployment_ids": ["deployment_id3", "deployment_id4"]
+            }],
+        "iss2": [ .... ]
+    }
+
+default (bool) - this iss config will be used in case if client-id was not passed on the login step
+client_id - this is the id received in the 'aud' during a launch
+auth_login_url - the platform's OIDC login endpoint
+auth_token_url - the platform's service authorization endpoint
+auth_audience - the platform's OAuth2 Audience (aud). Is used to get platform's access token,
+                Usually the same as "auth_token_url" but in the common case could be a different url
+key_set_url - the platform's JWKS endpoint
+key_set - in case if platform's JWKS endpoint somehow unavailable you may paste JWKS here
+deployment_ids (list) - The deployment_id passed by the platform during launch
+"""
+```
