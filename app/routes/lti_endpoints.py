@@ -1,6 +1,6 @@
 import os
 from jwcrypto import jwk
-from flask import Blueprint, current_app, url_for, redirect, session, jsonify
+from flask import Blueprint, current_app, url_for, redirect, session, jsonify, current_app
 from ..lti_lib import (
     lti_tool_conf,
     lti_launch_data_storage,
@@ -54,7 +54,7 @@ def launch():
     # Still testing this part
     data = message_launch.get_launch_data()
     session['launch_data'] = data
-    print(f'Data from launch: {data}')
+    current_app.logger.debug(f'Data from launch: {data}')
 
     launch_id = message_launch.get_launch_id()
     session['launch_id'] = launch_id

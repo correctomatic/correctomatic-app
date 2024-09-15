@@ -46,14 +46,14 @@ def get_current_user():
     # launch_data_storage = lti_launch_data_storage()
 
     launch_id = session.get('launch_id')
-    print(f'launch_id in submissions: {launch_id}')
+    current_app.logger.debug(f'launch_id in submissions: {launch_id}')
 
     message_launch = FlaskMessageLaunch.from_cache(
         launch_id, flask_request, tool_conf,
         # launch_data_storage=launch_data_storage
     )
     data = message_launch.get_launch_data()
-    print(data)
+    current_app.logger.debug(data)
     return data.get("sub")
 
     # Placeholder function. Replace with actual logic to get the current user.
@@ -81,7 +81,7 @@ def index():
 
 import requests
 def send_correction_request(assignment_id, submission_id, filename):
-    print(f"Calling banana function with assignment_id={assignment_id}, submission_id={submission_id}, filename={filename}")
+    current_app.logger.debug(f"Calling banana function with assignment_id={assignment_id}, submission_id={submission_id}, filename={filename}")
 
     callback_host = current_app.config['CALLBACK_HOST']
     upload_folder = current_app.config['UPLOAD_FOLDER']
@@ -165,7 +165,7 @@ def new_submission():
         # If banana fails, log the error (optional) and roll back the transaction
         db.session.delete(new_entry)
         # Log the error or handle it as needed
-        print(f"Error sending correction to correctomatic: {e}")
+        current_app.logger.debug(f"Error sending correction to correctomatic: {e}")
         # Optionally, delete the uploaded file
         os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
         # Return an error message to the user
