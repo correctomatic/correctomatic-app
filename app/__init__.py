@@ -29,13 +29,13 @@ def create_app():
     # ----------------------------------------
     current_log_level = app.logger.getEffectiveLevel()
     log_level_name = logging.getLevelName(current_log_level)
-    app.logger.error(f"El nivel de registro actual es: {log_level_name}")
+    app.logger.error(f"Current log level: {log_level_name}")
 
-    app.logger.debug('this is a DEBUG message')
-    app.logger.info('this is an INFO message')
-    app.logger.warning('this is a WARNING message')
-    app.logger.error('this is an ERROR message')
-    app.logger.critical('this is a CRITICAL message')
+    # app.logger.debug('this is a DEBUG message')
+    # app.logger.info('this is an INFO message')
+    # app.logger.warning('this is a WARNING message')
+    # app.logger.error('this is an ERROR message')
+    # app.logger.critical('this is a CRITICAL message')
     # ----------------------------------------
 
     # Set up caching configuration

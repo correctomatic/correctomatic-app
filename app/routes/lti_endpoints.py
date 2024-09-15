@@ -1,6 +1,7 @@
 import os
 from jwcrypto import jwk
-from flask import Blueprint, current_app, url_for, redirect, session, jsonify, current_app
+from flask import Blueprint, current_app, url_for, redirect, session, jsonify, current_app, request
+import jwt
 from ..lti_lib import (
     lti_tool_conf,
     lti_launch_data_storage,
@@ -42,8 +43,27 @@ def login():
 
     return oidc_login.enable_check_cookies().redirect(target_link_uri)
 
+def get_deployment_id_from_request(request):
+    # Get the token from the request
+    token = request.headers.get('Authorization')
+    if token and token.startswith('Bearer '):
+        token = token.split(' ')[1]  # Extract the token
+    else:
+        token = request.form.get('id_token')  # Try to get from form if not in headers
+
+    if not token:
+        return None  # Token not found
+
+    # Decode the JWT token without verifying the signature for now
+    decoded_token = jwt.decode(token, options={"verify_signature": False})
+
+    # Extract the deployment_id
+    deployment_id = decoded_token.get("https://purl.imsglobal.org/spec/lti/claim/deployment_id")
+    return deployment_id
+
 @bp.route("/launch", methods=["GET", "POST"])
 def launch():
+    current_app.logger.debug(f'Deployment ID: {get_deployment_id_from_request(request)}')
     flask_request = FlaskRequest()
 
     message_launch = FlaskMessageLaunch(
@@ -54,6 +74,10 @@ def launch():
     # Still testing this part
     data = message_launch.get_launch_data()
     session['launch_data'] = data
+
+    deployment_id = data.get("https://purl.imsglobal.org/spec/lti/claim/deployment_id")
+    current_app.logger.debug(f'Deployment ID: {deployment_id}')
+
     current_app.logger.debug(f'Data from launch: {data}')
 
     launch_id = message_launch.get_launch_id()
@@ -66,17 +90,6 @@ def launch():
 
 @bp.route("/jwks", methods=["GET"])
 def jwks():
-
-    # ----------------------------------------
-    # Debugging log level
-    # ----------------------------------------
-    current_app.logger.debug('this is a DEBUG message (Route: /jwks)')
-    current_app.logger.info('this is an INFO message (Route: /jwks)')
-    current_app.logger.warning('this is a WARNING message (Route: /jwks)')
-    current_app.logger.error('this is an ERROR message (Route: /jwks)')
-    current_app.logger.critical('this is a CRITICAL message (Route: /jwks)')
-    # ----------------------------------------
-
     __location__ = os.path.realpath(
         os.path.join(os.getcwd(), os.path.dirname(__file__))
     )

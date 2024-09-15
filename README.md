@@ -24,10 +24,12 @@ extensiones / Módulos de Actividad / Herramienta externa?
 
 ## Developer notes
 
-
 python -m venv .venv
 pip install flask psycopg2-binary
 pip install debugpy python-dotenv
+
+
+You can decode the token from the request with https://developer.pingidentity.com/en/tools/jwt-decoder.html
 
 ## Build and run the container in production
 
