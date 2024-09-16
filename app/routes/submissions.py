@@ -81,7 +81,7 @@ def index():
 
 import requests
 def send_correction_request(assignment_id, submission_id, filename):
-    current_app.logger.debug(f"Calling banana function with assignment_id={assignment_id}, submission_id={submission_id}, filename={filename}")
+    current_app.logger.debug(f"Calling send_correction_request function with assignment_id={assignment_id}, submission_id={submission_id}, filename={filename}")
 
     callback_host = current_app.config['CALLBACK_HOST']
     upload_folder = current_app.config['UPLOAD_FOLDER']
@@ -132,8 +132,6 @@ def new_submission():
         return redirect(request.url)
 
     file = request.files['file']
-
-
     if file.filename == '':
         return redirect(request.url)
 
@@ -163,10 +161,9 @@ def new_submission():
 
     except Exception as e:
         # If banana fails, log the error (optional) and roll back the transaction
-        db.session.delete(new_entry)
-        # Log the error or handle it as needed
+        db.session.rollback()
         current_app.logger.debug(f"Error sending correction to correctomatic: {e}")
-        # Optionally, delete the uploaded file
+        # Remove the file. Todo: nested try/except
         os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
         # Return an error message to the user
         return "An error occurred during submission. Please try again later.", 500
