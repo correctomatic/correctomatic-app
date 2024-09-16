@@ -19,8 +19,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --chown=python:python requirements.txt /app/
 RUN pip install --no-cache-dir --no-compile -r requirements.txt
 
+# App
 COPY --chown=python:python wsgi.py /app/
 COPY --chown=python:python app /app/app
+
+# Migrations
+COPY --chown=python:python alembic.ini /app/
+COPY --chown=python:python migrations /app/migrations
 
 # Precompile Python files
 RUN python -m compileall .
