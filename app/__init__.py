@@ -50,6 +50,12 @@ def create_app():
     app.config['CORRECTOMATIC_API_SERVER'] = os.getenv('CORRECTOMATIC_API_SERVER')
     app.config['DEFAULT_CONTAINER'] = os.getenv('DEFAULT_CONTAINER', 'correction-test-1')
 
+    # SQLAlchemy pool configuration
+    app.config['SQLALCHEMY_POOL_SIZE'] = 10         # Number of connections to keep in the pool
+    app.config['SQLALCHEMY_POOL_TIMEOUT'] = 5      # Timeout in seconds to get a connection from the pool
+    app.config['SQLALCHEMY_POOL_RECYCLE'] = 3600    # Time in seconds to recycle a connection
+    app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20      # Number of connections to allow beyond the pool size
+
     # Validations before running the app
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         raise ValueError(f'Upload folder {app.config["UPLOAD_FOLDER"]} does not exist')
