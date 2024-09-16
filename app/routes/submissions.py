@@ -102,7 +102,7 @@ def send_correction_request(assignment_id, submission_id, filename):
             'callback': f'{callback_host}/correctomatic-response'
         }
 
-        response = requests.post(f'{api_server}/grade', files=files, data=data)
+        response = requests.post(f'{api_server}/grade', files=files, data=data, timeout=5)
 
     # Check the response from the request
     if response.status_code != 200:
