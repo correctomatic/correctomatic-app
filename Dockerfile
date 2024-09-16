@@ -16,6 +16,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Install inet utils. Remove once the app is well tested
+RUN apt-get update && apt-get install -y \
+    iputils-ping \
+    iproute2 \
+    netcat-traditional \
+    net-tools \
+    curl \
+    dnsutils \
+    procps \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --chown=python:python requirements.txt /app/
 RUN pip install --no-cache-dir --no-compile -r requirements.txt
 
