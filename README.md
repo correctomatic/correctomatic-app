@@ -31,6 +31,13 @@ pip install debugpy python-dotenv
 
 You can decode the token from the request with https://developer.pingidentity.com/en/tools/jwt-decoder.html
 
+
+## Alembic
+
+alembic init migrations
+alembic revision --autogenerate -m "Create submissions table"
+alembic upgrade head
+
 ## Build and run the container in production
 
 You can build the container with the following command:

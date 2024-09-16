@@ -1,6 +1,8 @@
 import os
 from flask_sqlalchemy import SQLAlchemy
 
+# https://alembic.sqlalchemy.org/en/latest/
+
 db = SQLAlchemy()
 
 def get_connection_string():
