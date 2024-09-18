@@ -1,3 +1,4 @@
+import requests
 from datetime import datetime
 import os
 import uuid
@@ -79,7 +80,7 @@ def index():
         container=current_app.config['DEFAULT_CONTAINER']
         )
 
-import requests
+
 def send_correction_request(assignment_id, submission_id, filename):
     current_app.logger.debug(f"Calling send_correction_request function with assignment_id={assignment_id}, submission_id={submission_id}, filename={filename}")
 
