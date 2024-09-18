@@ -102,6 +102,7 @@ def send_correction_request(assignment_id, submission_id, filename):
             'callback': f'{callback_host}/correctomatic-response'
         }
 
+        current_app.logger.debug(f"Sending request to {api_server}/grade with data: {data}")
         response = requests.post(f'{api_server}/grade', files=files, data=data, timeout=5)
 
     # Check the response from the request
@@ -160,8 +161,10 @@ def new_submission():
         send_correction_request(container, new_entry.id, filename)
 
     except Exception as e:
-        # If banana fails, log the error (optional) and roll back the transaction
-        db.session.rollback()
+        # If banana fails, log the error (optional) and delete the entry
+        db.session.delete(new_entry)
+        db.session.commit()
+        
         current_app.logger.debug(f"Error sending correction to correctomatic: {e}")
         # Remove the file. Todo: nested try/except
         os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
