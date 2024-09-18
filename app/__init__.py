@@ -1,6 +1,7 @@
 import os
 import logging
-from flask import Flask
+import uuid
+from flask import Flask,g, request
 from flask_caching import Cache
 
 from .routes import lti_endpoints
@@ -24,19 +25,24 @@ def create_app():
     app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24))
     set_log_level(app)
 
+    # Generate a request ID for each incoming request
+    @app.before_request
+    def generate_request_id():
+        g.request_id = str(uuid.uuid4())
+        app.logger.info(f"Request ID: {g.request_id} - {request.method} {request.path}")
+
+    # Custom log format including the request ID
+    @app.after_request
+    def add_request_id_to_log(response):
+        app.logger.info(f"Request ID: {g.request_id} finished")
+        return response
+
     # ----------------------------------------
     # Debugging log level
     # ----------------------------------------
     current_log_level = app.logger.getEffectiveLevel()
     log_level_name = logging.getLevelName(current_log_level)
-    app.logger.error(f"Current log level: {log_level_name}")
-
-    # app.logger.debug('this is a DEBUG message')
-    # app.logger.info('this is an INFO message')
-    # app.logger.warning('this is a WARNING message')
-    # app.logger.error('this is an ERROR message')
-    # app.logger.critical('this is a CRITICAL message')
-    # ----------------------------------------
+    app.logger.info(f"Current log level: {log_level_name}")
 
     # Set up caching configuration
     app.config['CACHE_TYPE'] = 'simple'  # or 'filesystem', 'redis', 'memcached', etc.

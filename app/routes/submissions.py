@@ -164,13 +164,14 @@ def new_submission():
         # If banana fails, log the error (optional) and delete the entry
         db.session.delete(new_entry)
         db.session.commit()
-        
+
         current_app.logger.debug(f"Error sending correction to correctomatic: {e}")
         # Remove the file. Todo: nested try/except
         os.remove(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
         # Return an error message to the user
         return "An error occurred during submission. Please try again later.", 500
 
+    current_app.logger.info(f"New submission: {new_entry}")
     return redirect(url_for('submissions.index'))
 
 @bp.route('/download/<int:submission_id>')
