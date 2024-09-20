@@ -53,12 +53,13 @@ def get_current_user():
         launch_id, flask_request, tool_conf,
         # launch_data_storage=launch_data_storage
     )
-    data = message_launch.get_launch_data()
-    current_app.logger.debug(data)
-    return data.get("sub")
 
-    # Placeholder function. Replace with actual logic to get the current user.
-    return "current_user"
+    data = message_launch.get_launch_data()
+
+    current_app.logger.debug('Launch data:')
+    current_app.logger.debug(data)
+
+    return data.get("sub")
 
 
 @bp.route('/submissions', methods=["GET", "POST"])
