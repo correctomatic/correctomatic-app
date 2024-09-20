@@ -1,84 +1,19 @@
-import requests
-from datetime import datetime
 import os
+import requests
 import uuid
-from functools import wraps
+from datetime import datetime
 from werkzeug.utils import secure_filename
-from flask import (
-    Blueprint, render_template,
-    request, redirect, url_for,
-    current_app, send_from_directory,
-    session,
-    g
-)
+from flask import current_app, redirect, request, g, url_for
 
-from ..extensions import db
-from ..models import Submission
-
-bp = Blueprint('submissions', __name__)
+from app.models import Submission
+from app.extensions import db
+from . import bp
+from .utils import require_launch_data
 
 def unique_filename(filename):
     unique_id = uuid.uuid4().hex
     filename = secure_filename(filename)
     return f"{unique_id}_{filename}"
-
-# Define a custom Jinja2 filter
-@current_app.template_filter('nl2br')
-def nl2br(value):
-    """Convert newlines to <br> tags."""
-    if value is None:
-        return ''
-    return str(value).replace('\n', '<br>')
-
-def get_launch_data():
-    return session.get('launch_data')
-
-def get_current_user(launch_data):
-    return launch_data.get("sub")
-
-def get_assignment_id(launch_data):
-    return launch_data.get('https://purl.imsglobal.org/spec/lti/claim/custom', {}).get('assignment_id', None)
-
-def require_launch_data(methods=None):
-    def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            if methods and request.method not in methods: return
-
-            try:
-                launch_data = get_launch_data()
-                g.current_user = get_current_user(launch_data)
-                g.assignment_id = get_assignment_id(launch_data)
-            except Exception as e:
-                current_app.logger.error(f"Failed to load launch data: {e}")
-                g.current_user = None
-                g.assignment_id = None
-            return f(*args, **kwargs)
-
-        return decorated_function
-    return decorator
-
-@bp.route('/submissions', methods=["GET", "POST"])
-@require_launch_data(methods=['GET', 'POST'])
-def index():
-    current_user = g.current_user
-    assignment_id = g.assignment_id
-    current_app.logger.info(f"Current user: {current_user}. Assignment ID: {assignment_id}")
-    submissions = (Submission.query
-        .filter_by(user_id=current_user)
-        .order_by(Submission.started.desc())
-        .all()
-        )
-    last_submission = submissions[0] if submissions else None
-    last_submission_pending = last_submission and last_submission.status == 'Pending'
-
-    return render_template(
-        'submissions.jinja2',
-        submissions=submissions,
-        last_submission_pending=last_submission_pending,
-        assignment_id=assignment_id
-        )
-
 
 def send_correction_request(assignment_id, submission_id, filename):
     current_app.logger.debug(f"Calling send_correction_request function with assignment_id={assignment_id}, submission_id={submission_id}, filename={filename}")
@@ -116,9 +51,10 @@ def send_correction_request(assignment_id, submission_id, filename):
 
     return True
 
-@bp.route('/new_submission', methods=['POST'])
-def new_submission():
-    current_user = get_current_user()
+@bp.route('/new', methods=['POST'])
+@require_launch_data()
+def new():
+    current_user = g.current_user
 
     # Check if the last submission is still pending
     last_submission = (
@@ -174,12 +110,3 @@ def new_submission():
     current_app.logger.info(f"New submission: {new_entry}")
     return redirect(url_for('submissions.index'))
 
-@bp.route('/download/<int:submission_id>')
-def download_file(submission_id):
-    current_user = get_current_user()
-    submission = Submission.query.get_or_404(submission_id)
-
-    if submission.user_id != current_user:
-        return redirect(url_for('submissions.index'))
-
-    return send_from_directory(current_app.config['UPLOAD_FOLDER'], submission.filename, as_attachment=True)

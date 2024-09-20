@@ -82,7 +82,7 @@ def create_app():
 
         # Register Blueprints
         app.register_blueprint(home.bp)
-        app.register_blueprint(submissions.bp)
+        app.register_blueprint(submissions.bp, url_prefix='/submissions')
         app.register_blueprint(responses.bp)
         app.register_blueprint(lti_endpoints.bp)
 
