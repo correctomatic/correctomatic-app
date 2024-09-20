@@ -2,12 +2,14 @@ import requests
 from datetime import datetime
 import os
 import uuid
+from functools import wraps
 from werkzeug.utils import secure_filename
 from flask import (
     Blueprint, render_template,
     request, redirect, url_for,
     current_app, send_from_directory,
-    session
+    session,
+    g
 )
 
 from ..extensions import db
@@ -40,18 +42,18 @@ def nl2br(value):
         return ''
     return str(value).replace('\n', '<br>')
 
-def get_current_user():
 
+def get_launch_data():
     tool_conf = lti_tool_conf()
     flask_request = FlaskRequest()
-    # launch_data_storage = lti_launch_data_storage()
+    launch_data_storage = lti_launch_data_storage()
 
     launch_id = session.get('launch_id')
-    current_app.logger.debug(f'launch_id in submissions: {launch_id}')
+    current_app.logger.debug(f'Launch_id: {launch_id}')
 
     message_launch = FlaskMessageLaunch.from_cache(
         launch_id, flask_request, tool_conf,
-        # launch_data_storage=launch_data_storage
+        launch_data_storage=launch_data_storage
     )
 
     data = message_launch.get_launch_data()
@@ -59,13 +61,41 @@ def get_current_user():
     current_app.logger.debug('Launch data:')
     current_app.logger.debug(data)
 
-    return data.get("sub")
+    return data
 
+def get_current_user(launch_data):
+    return launch_data.get("sub")
+
+def get_assignment_id(launch_data):
+    assignment_id = launch_data.get('https://purl.imsglobal.org/spec/lti/claim/custom', {}).get('assignment_id', None)
+    return assignment_id
+
+
+def require_launch_data(methods=None):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if methods and request.method not in methods: return
+
+            try:
+                launch_data = get_launch_data()
+                g.current_user = get_current_user(launch_data)
+                g.assignment_id = get_assignment_id(launch_data)
+            except Exception as e:
+                current_app.logger.error(f"Failed to load launch data: {e}")
+                g.current_user = None
+                g.assignment_id = None
+            return f(*args, **kwargs)
+
+        return decorated_function
+    return decorator
 
 @bp.route('/submissions', methods=["GET", "POST"])
+@require_launch_data(methods=['GET', 'POST'])
 def index():
 
-    current_user = get_current_user()
+    current_user = g.current_user
+    assignment_id = g.assignment_id
     submissions = (Submission.query
         .filter_by(user_id=current_user)
         .order_by(Submission.started.desc())
@@ -78,7 +108,7 @@ def index():
         'submissions.jinja2',
         submissions=submissions,
         last_submission_pending=last_submission_pending,
-        container=current_app.config['DEFAULT_CONTAINER']
+        assignment_id=current_app.config['DEFAULT_ASSIGNMENT']
         )
 
 
@@ -159,8 +189,8 @@ def new_submission():
         # to get the new entry ID
         db.session.commit()
 
-        container = request.form['container']
-        send_correction_request(container, new_entry.id, filename)
+        assignment_id = request.form['assignment_id']
+        send_correction_request(assignment_id, new_entry.id, filename)
 
     except Exception as e:
         # If banana fails, log the error (optional) and delete the entry

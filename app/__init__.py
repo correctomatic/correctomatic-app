@@ -54,7 +54,7 @@ def create_app():
     app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', os.path.join(app.root_path, "..", "uploads"))
     app.config['CALLBACK_HOST'] = os.getenv('CALLBACK_HOST', 'http://localhost:5000')
     app.config['CORRECTOMATIC_API_SERVER'] = os.getenv('CORRECTOMATIC_API_SERVER')
-    app.config['DEFAULT_CONTAINER'] = os.getenv('DEFAULT_CONTAINER', 'correction-test-1')
+    app.config['DEFAULT_ASSIGNMENT'] = os.getenv('DEFAULT_ASSIGNMENT', 'correction-test-1')
 
     # SQLAlchemy pool configuration
     app.config['SQLALCHEMY_POOL_SIZE'] = 10         # Number of connections to keep in the pool

@@ -19,5 +19,5 @@ EXPOSE 5000
 EXPOSE 5678
 
 # Run the application
-CMD ["python", "app.py"]
+CMD ["python", "wgsi.py"]
 
