@@ -15,18 +15,6 @@ from flask import (
 from ..extensions import db
 from ..models import Submission
 
-from ..lti_lib import (
-    lti_tool_conf,
-    lti_launch_data_storage,
-    lti_config_dir
-)
-from pylti1p3.contrib.flask import (
-    FlaskOIDCLogin,
-    FlaskMessageLaunch,
-    FlaskRequest,
-    FlaskCacheDataStorage,
-)
-
 bp = Blueprint('submissions', __name__)
 
 def unique_filename(filename):
@@ -42,34 +30,14 @@ def nl2br(value):
         return ''
     return str(value).replace('\n', '<br>')
 
-
 def get_launch_data():
-    tool_conf = lti_tool_conf()
-    flask_request = FlaskRequest()
-    launch_data_storage = lti_launch_data_storage()
-
-    launch_id = session.get('launch_id')
-    current_app.logger.debug(f'Launch_id: {launch_id}')
-
-    message_launch = FlaskMessageLaunch.from_cache(
-        launch_id, flask_request, tool_conf,
-        launch_data_storage=launch_data_storage
-    )
-
-    data = message_launch.get_launch_data()
-
-    current_app.logger.debug('Launch data:')
-    current_app.logger.debug(data)
-
-    return data
+    return session.get('launch_data')
 
 def get_current_user(launch_data):
     return launch_data.get("sub")
 
 def get_assignment_id(launch_data):
-    assignment_id = launch_data.get('https://purl.imsglobal.org/spec/lti/claim/custom', {}).get('assignment_id', None)
-    return assignment_id
-
+    return launch_data.get('https://purl.imsglobal.org/spec/lti/claim/custom', {}).get('assignment_id', None)
 
 def require_launch_data(methods=None):
     def decorator(f):
@@ -93,9 +61,9 @@ def require_launch_data(methods=None):
 @bp.route('/submissions', methods=["GET", "POST"])
 @require_launch_data(methods=['GET', 'POST'])
 def index():
-
     current_user = g.current_user
     assignment_id = g.assignment_id
+    current_app.logger.info(f"Current user: {current_user}. Assignment ID: {assignment_id}")
     submissions = (Submission.query
         .filter_by(user_id=current_user)
         .order_by(Submission.started.desc())
@@ -108,7 +76,7 @@ def index():
         'submissions.jinja2',
         submissions=submissions,
         last_submission_pending=last_submission_pending,
-        assignment_id=current_app.config['DEFAULT_ASSIGNMENT']
+        assignment_id=assignment_id
         )
 
 
