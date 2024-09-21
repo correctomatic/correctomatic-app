@@ -7,7 +7,7 @@ from alembic import context
 
 from dotenv import load_dotenv
 from app.extensions import db, get_connection_string
-from app.models.submission import Submission
+from app.models import *
 
 load_dotenv(override=True)
 
