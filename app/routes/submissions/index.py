@@ -27,7 +27,7 @@ def index():
     last_submission_pending = last_submission and last_submission.status == 'Pending'
 
     return render_template(
-        'submissions.jinja2',
+        'submissions.j2',
         submissions=submissions,
         last_submission_pending=last_submission_pending,
         assignment_id=assignment_id
