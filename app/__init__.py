@@ -4,7 +4,6 @@ import uuid
 from flask import Flask,g, request
 from flask_caching import Cache
 
-from .routes import lti_endpoints
 from .extensions import db, get_connection_string
 
 def set_log_level(app):
@@ -79,11 +78,12 @@ def create_app():
         app.cache = cache
 
         from .routes import home, submissions, responses
+        from .routes import lti
 
         # Register Blueprints
         app.register_blueprint(home.bp)
         app.register_blueprint(submissions.bp, url_prefix='/submissions')
         app.register_blueprint(responses.bp)
-        app.register_blueprint(lti_endpoints.bp)
+        app.register_blueprint(lti.bp, url_prefix='/lti')
 
         return app
