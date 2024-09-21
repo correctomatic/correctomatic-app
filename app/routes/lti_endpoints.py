@@ -2,7 +2,7 @@ import os
 from jwcrypto import jwk
 from flask import Blueprint, current_app, url_for, redirect, session, jsonify, current_app, request
 import jwt
-from ..lti_lib import (
+from ..lib.lti_lib import (
     lti_tool_conf,
     lti_launch_data_storage,
     lti_config_dir
@@ -63,7 +63,7 @@ def get_deployment_id_from_request(request):
 
 @bp.route("/launch", methods=["GET", "POST"])
 def launch():
-    current_app.logger.debug(f'Deployment ID: {get_deployment_id_from_request(request)}')
+    current_app.logger.debug(f'Deployment ID in request: {get_deployment_id_from_request(request)}')
     flask_request = FlaskRequest()
 
     message_launch = FlaskMessageLaunch(
@@ -76,7 +76,7 @@ def launch():
     session['launch_data'] = data
 
     deployment_id = data.get("https://purl.imsglobal.org/spec/lti/claim/deployment_id")
-    current_app.logger.debug(f'Deployment ID: {deployment_id}')
+    current_app.logger.debug(f'Deployment ID in launch data: {deployment_id}')
 
     current_app.logger.debug(f'Data from launch: {data}')
 
