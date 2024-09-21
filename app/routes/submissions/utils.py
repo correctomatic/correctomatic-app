@@ -15,6 +15,8 @@ def get_current_user(launch_data):
 def get_assignment_id(launch_data):
     return launch_data.get('https://purl.imsglobal.org/spec/lti/claim/custom', {}).get('assignment_id', None)
 
+# TO-DO: Allow getting "launch data" from a different source
+# That way, we can use this app outside of the LTI context
 def require_launch_data(methods=None):
     def decorator(f):
         @wraps(f)
