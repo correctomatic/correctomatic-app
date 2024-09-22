@@ -1,11 +1,11 @@
 import jwt
-from flask import current_app, url_for, redirect, session, current_app, request
+from flask import current_app, url_for, redirect, session, current_app, request, flash, abort
 from pylti1p3.contrib.flask import FlaskMessageLaunch, FlaskRequest
 
 from . import bp
 from app.lib.lti_lib import lti_tool_conf
 
-def get_deployment_id_from_request(request):
+def get_site_data_from_request(request):
     # Get the token from the request
     token = request.headers.get('Authorization')
     if token and token.startswith('Bearer '):
@@ -19,13 +19,15 @@ def get_deployment_id_from_request(request):
     # Decode the JWT token without verifying the signature for now
     decoded_token = jwt.decode(token, options={"verify_signature": False})
 
-    # Extract the deployment_id
+    site = decoded_token.get("iss")
     deployment_id = decoded_token.get("https://purl.imsglobal.org/spec/lti/claim/deployment_id")
-    return deployment_id
+
+    return [ site, deployment_id ]
 
 @bp.route("/launch", methods=["GET", "POST"])
 def launch():
-    current_app.logger.debug(f'Deployment ID in request: {get_deployment_id_from_request(request)}')
+    [ site, id ] = get_site_data_from_request(request)
+    current_app.logger.debug(f'Request data - Site: {site}, ID: {id}')
     flask_request = FlaskRequest()
 
     message_launch = FlaskMessageLaunch(
@@ -34,8 +36,13 @@ def launch():
     )
 
     # Still testing this part
-    data = message_launch.get_launch_data()
-    session['launch_data'] = data
+    try:
+        data = message_launch.get_launch_data()
+        session['launch_data'] = data
+    except Exception as e:
+        current_app.logger.error(f'Error getting launch: {e}')
+        flash(f'The site is not autorized: [{site}]/[{id}]', "danger")
+        abort(403)
 
     deployment_id = data.get("https://purl.imsglobal.org/spec/lti/claim/deployment_id")
     current_app.logger.debug(f'Deployment ID in launch data: {deployment_id}')
