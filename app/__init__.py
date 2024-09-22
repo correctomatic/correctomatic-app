@@ -5,6 +5,7 @@ from flask import Flask,g, request
 from flask_caching import Cache
 
 from .extensions import db, get_connection_string
+from .errors import register_errors
 
 def set_log_level(app):
     DEFAULT_LOG_LEVEL = 'WARNING'
@@ -85,5 +86,7 @@ def create_app():
         app.register_blueprint(submissions.bp, url_prefix='/submissions')
         app.register_blueprint(responses.bp)
         app.register_blueprint(lti.bp, url_prefix='/lti')
+
+        register_errors(app)
 
         return app
