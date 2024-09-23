@@ -31,7 +31,6 @@ COPY --chown=python:python requirements.txt /app/
 RUN pip install --no-cache-dir --no-compile -r requirements.txt
 
 # App
-COPY --chown=python:python wsgi.py /app/
 COPY --chown=python:python app /app/app
 
 # Migrations
