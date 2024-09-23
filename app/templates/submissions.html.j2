@@ -35,7 +35,7 @@
                 Show errors
             </button>
             {% endif %}
-            <a href="{{ url_for('submissions.download_file', submission_id=submission.id) }}">
+            <a href="{{ url_for('submissions.download', submission_id=submission.id) }}">
                 <button type="button">
                     Download file
                 </button>
