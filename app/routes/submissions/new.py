@@ -34,7 +34,7 @@ def send_correction_request(assignment_id, submission_id, filename):
         data = {
             'work_id': submission_id,
             'assignment_id': assignment_id,
-            'callback': f'{callback_host}/correctomatic-response'
+            'callback': f'{callback_host}{url_for("responses.response")}'
         }
 
         current_app.logger.debug(f"Sending request to {api_server}/grade with data: {data}")
