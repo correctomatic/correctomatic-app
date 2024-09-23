@@ -1,0 +1,13 @@
+{% extends "errors/error.html.j2" %}
+
+{% block title %}Internal error{% endblock %}
+
+{% block content %}
+
+  <h1>Internal error</h1>
+  {# {% for category, message in get_flashed_messages(with_categories=true) %}
+              <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %} #}
+  The server could not process your request.
+
+{% endblock %}

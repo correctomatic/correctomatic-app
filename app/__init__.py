@@ -4,8 +4,8 @@ import uuid
 from flask import Flask,g, request
 from flask_caching import Cache
 
-from .routes import lti_endpoints
 from .extensions import db, get_connection_string
+from .errors import register_errors
 
 def set_log_level(app):
     DEFAULT_LOG_LEVEL = 'WARNING'
@@ -54,7 +54,7 @@ def create_app():
     app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', os.path.join(app.root_path, "..", "uploads"))
     app.config['CALLBACK_HOST'] = os.getenv('CALLBACK_HOST', 'http://localhost:5000')
     app.config['CORRECTOMATIC_API_SERVER'] = os.getenv('CORRECTOMATIC_API_SERVER')
-    app.config['DEFAULT_CONTAINER'] = os.getenv('DEFAULT_CONTAINER', 'correction-test-1')
+    app.config['DEFAULT_ASSIGNMENT'] = os.getenv('DEFAULT_ASSIGNMENT', 'correction-test-1')
 
     # SQLAlchemy pool configuration
     app.config['SQLALCHEMY_POOL_SIZE'] = 10         # Number of connections to keep in the pool
@@ -78,12 +78,16 @@ def create_app():
     with app.app_context():
         app.cache = cache
 
-        from .routes import home, submissions, responses
+        from .routes import lti
+        from .routes import home, submissions
+        from .routes import correctomatic
 
         # Register Blueprints
         app.register_blueprint(home.bp)
-        app.register_blueprint(submissions.bp)
-        app.register_blueprint(responses.bp)
-        app.register_blueprint(lti_endpoints.bp)
+        app.register_blueprint(submissions.bp, url_prefix='/submissions')
+        app.register_blueprint(correctomatic.bp, url_prefix='/correctomatic')
+        app.register_blueprint(lti.bp, url_prefix='/lti')
+
+        register_errors(app)
 
         return app

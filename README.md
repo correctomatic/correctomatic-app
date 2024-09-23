@@ -241,3 +241,30 @@ key_set - in case if platform's JWKS endpoint somehow unavailable you may paste 
 deployment_ids (list) - The deployment_id passed by the platform during launch
 """
 ```
+
+
+### Passing parameters
+
+
+192.168.3.5 - - [20/Sep/2024 06:50:34] "POST /login HTTP/1.1" 200 -
+
+192.168.3.5 - - [20/Sep/2024 06:50:45] "GET /login?lti1p3_new_window=1&iss=http://moodle.lti&login_hint=2&target_link_uri=http://app.host.lti:5000/launch&lti_message_hint={"cmid":2,"launchid":"ltilaunch1_1110149175"}&lti_deployment_id=1&client_id=VeDBJjVL0qiEB6z HTTP/1.1" 302 -
+
+192.168.3.5 - - [20/Sep/2024 06:50:45] "POST /launch HTTP/1.1" 302 -
+
+192.168.3.5 - - [20/Sep/2024 06:50:45] "GET /submissions HTTP/1.1" 200 -
+
+192.168.3.5 - - [20/Sep/2024 06:50:45] "GET /login?lti1p3_new_window=1&iss=http://moodle.lti&login_hint=2&target_link_uri=http://app.host.lti:5000/launch&lti_message_hint={"cmid":2,"launchid":"ltilaunch1_1110149175"}&lti_deployment_id=1&client_id=VeDBJjVL0qiEB6z HTTP/1.1" 302 -
+
+
+------
+
+[2024-09-20 06:53:41,744] INFO in __init__: Request ID: 56ff0f54-caec-4b9a-a80d-c7b252af9407 finished
+192.168.3.5 - - [20/Sep/2024 06:53:41] "POST /launch HTTP/1.1" 302 -
+[2024-09-20 06:53:41,754] INFO in __init__: Request ID: 3f816d6f-bd7b-4763-b973-d8cc087e39f1 - GET /submissions
+[2024-09-20 06:53:41,756] DEBUG in submissions: launch_id in submissions: lti1p3-launch-36c0a55b-03e4-4ca4-a0b8-ad1b2daaaf49
+[2024-09-20 06:53:41,757] DEBUG in submissions: {'aud': 'VeDBJjVL0qiEB6z', 'exp': 1726808081, 'https://purl.imsglobal.org/spec/lti/claim/context': {'id': '2', 'label': 'pruebas1', 'title': 'Pruebas 1', 'type': ['CourseSection']}, 'https://purl.imsglobal.org/spec/lti/claim/custom': {'patata': '********************************'}, 'https://purl.imsglobal.org/spec/lti/claim/deployment_id': '1', 'https://purl.imsglobal.org/spec/lti/claim/ext': {'lms': 'moodle-2'}, 'https://purl.imsglobal.org/spec/lti/claim/launch_presentation': {'document_target': 'iframe', 'locale': 'es', 'return_url': 'http://moodle.lti/mod/lti/return.php?course=2&launch_container=3&instanceid=1&sesskey=06TF8Rsa8c'}, 'https://purl.imsglobal.org/spec/lti/claim/lis': {'course_section_sourcedid': '', 'person_sourcedid': ''}, 'https://purl.imsglobal.org/spec/lti/claim/message_type': 'LtiResourceLinkRequest', 'https://purl.imsglobal.org/spec/lti/claim/resource_link': {'description': '', 'id': '1', 'title': 'local - 1'}, 'https://purl.imsglobal.org/spec/lti/claim/roles': ['http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator', 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor', 'http://purl.imsglobal.org/vocab/lis/v2/system/person#Administrator'], 'https://purl.imsglobal.org/spec/lti/claim/target_link_uri': 'http://app.host.lti:5000/launch', 'https://purl.imsglobal.org/spec/lti/claim/tool_platform': {'description': 'Moodle de pruebas LTI', 'guid': 'moodle.lti', 'name': 'moodle-lti', 'product_family_code': 'moodle', 'version': '2023100904'}, 'https://purl.imsglobal.org/spec/lti/claim/version': '1.3.0', 'iat': 1726808021, 'iss': 'http://moodle.lti', 'nonce': '2084cf776e2f44ffaa878d7b855e8f8c4ec4d9b2770c11ef9b2757c1532c3e24', 'sub': '2'}
+[2024-09-20 06:53:41,761] INFO in __init__: Request ID: 3f816d6f-bd7b-4763-b973-d8cc087e39f1 finished
+
+Aquí están los parámetros personalizados, dentro de launch data:
+https://purl.imsglobal.org/spec/lti/claim/custom

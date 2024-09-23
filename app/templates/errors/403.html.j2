@@ -1,0 +1,12 @@
+{% extends "errors/error.html.j2" %}
+
+{% block title %}Forbidden{% endblock %}
+
+{% block content %}
+
+  <h1>Forbidden</h1>
+  {% for category, message in get_flashed_messages(with_categories=true) %}
+              <div class="flash {{ category }}">{{ message }}</div>
+  {% endfor %}
+
+{% endblock %}

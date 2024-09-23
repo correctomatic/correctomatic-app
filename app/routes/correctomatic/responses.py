@@ -1,16 +1,15 @@
-from flask import Blueprint, request, jsonify
-from ..extensions import db
-from ..models import Submission
+from flask import request, jsonify
+from app.extensions import db
+from app.models import Submission
 
-bp = Blueprint("correctomatic", __name__)
-
+from . import bp
 
 # Endpoint to receive Correctomatic responses
-@bp.route("/correctomatic-response", methods=["POST"])
-def correctomatic_response():
+@bp.route("/response", methods=["POST"])
+def response():
     is_json = request.is_json
     if not is_json: return jsonify({"message": "Invalid JSON payload"}), 400
-    
+
     data = request.get_json()
 
     # Extract relevant fields from the JSON payload
