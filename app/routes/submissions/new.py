@@ -3,7 +3,7 @@ import requests
 import uuid
 from datetime import datetime
 from werkzeug.utils import secure_filename
-from werkzeug.exceptions import InternalServerError
+from werkzeug.exceptions import BadRequest
 from flask import current_app, redirect, request, g, url_for, flash, abort
 
 from app.models import Submission
@@ -52,11 +52,20 @@ def send_correction_request(assignment_id, submission_id, filename):
 
     return True
 
+def check_required_params():
+    if not g.current_user:
+        raise BadRequest("Missing user in request")
+    if not g.assignment_id:
+        raise BadRequest("Missing assignment id in request. Please make add 'assignment_id=<your assignment id>' as a parameter.")
+
 @bp.route('/new', methods=['POST'])
 @require_launch_data()
 def new():
     try:
+        check_required_params()
+
         current_user = g.current_user
+        assignment_id = g.assignment_id
 
         # Check if the last submission is still pending
         last_submission = (
@@ -82,6 +91,7 @@ def new():
 
         new_entry = Submission(
             user_id=current_user,
+            assignment_id=assignment_id,
             started=datetime.now(),
             status='Pending',
             comments='',
@@ -95,7 +105,6 @@ def new():
 
         try:
 
-            assignment_id = request.form['assignment_id']
             send_correction_request(assignment_id, new_entry.id, filename)
 
         except Exception as e:

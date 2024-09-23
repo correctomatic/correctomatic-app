@@ -23,6 +23,7 @@ def upgrade() -> None:
     op.create_table('submission',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.String(length=80), nullable=False),
+    sa.Column('assignment_id', sa.String(length=255), nullable=False),
     sa.Column('started', sa.DateTime(), nullable=True),
     sa.Column('status', sa.String(length=20), nullable=False),
     sa.Column('grade', sa.String(length=10), nullable=True),

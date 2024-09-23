@@ -27,6 +27,7 @@ def require_launch_data(methods=None):
                 launch_data = get_launch_data()
                 g.current_user = get_current_user(launch_data)
                 g.assignment_id = get_assignment_id(launch_data)
+                current_app.logger.debug(f"Current user: {g.current_user}. Assignment ID: {g.assignment_id}")
             except Exception as e:
                 current_app.logger.error(f"Failed to load launch data: {e}")
                 g.current_user = None

@@ -7,7 +7,6 @@
 <form action="{{ url_for('submissions.new') }}" method="post" enctype="multipart/form-data">
     <input type="file" name="file" required>
     <button type="submit">New submission...</button>
-    <input type="text" name="assignment_id" placeholder="Enter the assignment_id" value="{{ assignment_id }}" required>
 </form>
 {% endif %}
 <br>
