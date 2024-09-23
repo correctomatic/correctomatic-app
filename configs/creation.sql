@@ -6,7 +6,7 @@ VALUES
   (
     1,
     'https://aules.edu.gva.es/ed',
-    'vUktVZGUdUE3k8O',
+    'YD56yxE8ywXKrjt',
     'https://aules.edu.gva.es/ed/mod/lti/auth.php',
     'https://aules.edu.gva.es/ed/mod/lti/token.php',
     NULL,
@@ -19,7 +19,7 @@ VALUES
 -- Deployments
 INSERT INTO deployment (platform_id, deployment_id)
 VALUES
-  (1, '2');
+  (1, '3');
 
 
 
