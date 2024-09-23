@@ -47,18 +47,16 @@ def login():
         login = oidc_login.enable_check_cookies().redirect(flask_request.get_param("target_link_uri"))
 
     except BadRequest as e:
-        flash(f'Bad Request: {e.description}', "danger")
+        flash(f'Bad Request: {e.description}', 'error')
         return abort(400)
 
     except Forbidden as e:
-        flash(f'{e.description}', "danger")
+        flash(f'{e.description}', 'error')
         return abort(403)
 
     except Exception as e:
-        # TO-DO: how to catch the type of error?
         current_app.logger.error(f'Error getting launch: {e}')
-        flash(f'Something bad happened in login', "danger")
-        # flash(f'The site is not autorized: [{site}]/[{id}]', "danger")
+        flash(f'Something bad happened in login', 'error')
         abort(500)
 
     return login
