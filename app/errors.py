@@ -9,8 +9,12 @@ def forbidden(e):
 def bad_request(e):
     return render_template('errors/400.html.j2'), 400
 
+def internal_server_error(e):
+    return render_template('errors/500.html.j2'), 500
+
 def register_errors(app):
     app.register_error_handler(400, bad_request)
     app.register_error_handler(403, forbidden)
     app.register_error_handler(404, page_not_found)
+    app.register_error_handler(500, internal_server_error)
 

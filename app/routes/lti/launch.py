@@ -1,5 +1,5 @@
 import jwt
-from werkzeug.exceptions import Forbidden, BadRequest
+from werkzeug.exceptions import Forbidden
 from flask import current_app, url_for, redirect, session, current_app, request, flash, abort
 from pylti1p3.contrib.flask import FlaskMessageLaunch, FlaskRequest
 
