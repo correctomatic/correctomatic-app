@@ -16,15 +16,20 @@ def check_target_link_uri(flask_request):
     if not target_link_uri:
         raise BadRequest('Missing "target_link_uri" param')
 
-def check_iss_param(flask_request, tool_conf):
+def check_iss_params(flask_request, tool_conf):
     iss = flask_request.get_param("iss")
+    client_id = flask_request.get_param("client_id")
+
     if not iss:
         raise BadRequest('Missing "iss" param in request')
 
+    if not client_id:
+        raise BadRequest('Missing "client_id" param in request')
+
     try:
-        tool_conf.find_registration(iss)
+        tool_conf.find_registration_by_params(iss, client_id)
     except Exception as e:
-        message = f'Registration for "iss" ({iss}) not found in tool configuration'
+        message = f'Registration for [{iss}/{client_id}] not found in tool configuration'
         current_app.logger.error(f'{message}, exception: {e}')
         raise Forbidden(message)
 
@@ -35,7 +40,7 @@ def login():
         flask_request = FlaskRequest()
 
         check_target_link_uri(flask_request)
-        check_iss_param(flask_request, tool_conf)
+        check_iss_params(flask_request, tool_conf)
 
         oidc_login = FlaskOIDCLogin(
             request=flask_request,
