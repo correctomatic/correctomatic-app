@@ -42,10 +42,10 @@
         </td>
     </tr>
     <tr id="comments-{{ submission.id }}" class="toggle-content">
-        <td colspan="4">{{ submission.comments |nl2br |safe }}</td>
+        <td colspan="4">{{ submission.comments | e | nl2br | safe }}</td>
     </tr>
     <tr id="errors-{{ submission.id }}" class="toggle-content">
-        <td colspan="4">{{ submission.errors |nl2br |safe }}</td>
+        <td colspan="4">{{ submission.errors | e | nl2br | safe }}</td>
     </tr>
     {% endfor %}
 </table>
