@@ -30,6 +30,7 @@ def new():
 
         current_user = g.current_user
         assignment_id = g.assignment_id
+        correction_params = g.correction_params
 
         # Check if the last submission is still pending
         last_submission = (
@@ -69,7 +70,7 @@ def new():
 
         try:
 
-            send_correction_request(assignment_id, new_entry.id, filename)
+            send_correction_request(assignment_id, new_entry.id, filename, correction_params)
 
         except Exception as e:
             current_app.logger.debug(f"Error sending correction to correctomatic: {e}")

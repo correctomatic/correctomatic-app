@@ -3,7 +3,7 @@ import os
 import requests
 from flask import current_app, url_for
 
-def send_correction_request(assignment_id, submission_id, filename):
+def send_correction_request(assignment_id, submission_id, filename, custom_params={}):
     current_app.logger.debug(f"Calling send_correction_request function with assignment_id={assignment_id}, submission_id={submission_id}, filename={filename}")
 
     callback_host = current_app.config['CALLBACK_HOST']
@@ -11,30 +11,31 @@ def send_correction_request(assignment_id, submission_id, filename):
     api_server = current_app.config['CORRECTOMATIC_API_SERVER']
     file_path = os.path.join(upload_folder, filename)
 
-    # Ensure the file exists before making the request
     if not os.path.exists(file_path):
-        return f"Error: File {filename} does not exist", 400
+        raise Exception(f"Error: File {file_path} does not exist")
 
     with open(file_path, 'rb') as file:
-        files = {
-            'file': (filename, file),
-        }
-        data = {
-            'work_id': submission_id,
-            'assignment_id': assignment_id,
-            'callback': f'{callback_host}{url_for("correctomatic.response")}'
-        }
+        # We need to send the file as a tuple because we have repeated param fields
+        files = [
+            ('file', (filename, file)),
+            ('work_id', (None, submission_id)),
+            ('assignment_id', (None, assignment_id)),
+            ('callback', (None, f'{callback_host}{url_for("correctomatic.response")}'))
+        ]
 
-        current_app.logger.debug(f"Sending request to {api_server}/grade with data: {data}")
-        response = requests.post(f'{api_server}/grade', files=files, data=data, timeout=5)
+        # Add custom params to the request
+        for key, value in custom_params.items():
+            if key != 'assignment_id':  # Excluir 'assignment_id'
+                files.append(('param', (None, f"{key}={value}")))
 
-    # Check the response from the request
+        current_app.logger.debug(f"Sending request to {api_server}/grade with files: {files}")
+        response = requests.post(f'{api_server}/grade', files=files, timeout=5)
+
     if response.status_code != 200:
-        # Handle the error as needed
-        raise f'Error: {response.status_code} - {response.text}'
+        raise Exception(f'Error: {response.status_code} - {response.text}')
 
     response_data = response.json()
     if not response_data.get("success"):
-        raise f'error: {response_data.get("message", "Unknown error occurred")}'
+        raise Exception(f'Error: {response_data.get("message", "Unknown error occurred")}')
 
     return True
