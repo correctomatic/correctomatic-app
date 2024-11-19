@@ -6,10 +6,11 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 def get_connection_string():
-    user = os.getenv('POSTGRES_USER')
-    password = os.getenv('POSTGRES_PASSWORD')
-    host = os.getenv('POSTGRES_HOST', 'localhost')
-    port = os.getenv('POSTGRES_PORT', '5432')
+    database = os.getenv('DB_NAME', 'correctomatic')
+    user = os.getenv('DB_USER')
+    password = os.getenv('DB_PASSWORD')
+    host = os.getenv('DB_HOST', 'localhost')
+    port = os.getenv('DB_PORT', '5432')
 
-    return f'postgresql://{user}:{password}@{host}:{port}/correctomatic'
+    return f'postgresql://{user}:{password}@{host}:{port}/{database}'
 

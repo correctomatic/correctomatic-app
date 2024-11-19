@@ -48,10 +48,10 @@ To run the container, you need to set the following environment variables:
 
 - `FLASK_ENV`: `production` or `development`, defaults to `production`
 - `FLASK_SECRET_KEY`: secret key for the Flask app. It will initialize to a random value if not set.
-- `POSTGRES_USER`, `POSTGRES_PASSWORD`: database credentials
-- `POSTGRES_HOST`: database host, from the viewpoint of the app container. You can add the database host using the `--add-host` option when running the container.
-- `POSTGRES_PORT`: database port, defaults to 5432
-- `POSTGRES_DB`: database name
+- `DB_USER`, `DB_PASSWORD`: database credentials
+- `DB_HOST`: database host, from the viewpoint of the app container. You can add the database host using the `--add-host` option when running the container.
+- `DB_PORT`: database port, defaults to 5432
+- `DB_NAME`: database name
 - `CORRECTOMATIC_API_SERVER`: URL of the correctomatic API server from the viewpoint of the app container
 - `CALLBACK_HOST`: host and port of this app from the correctomatic viewpoint. You will probably need to set this to `http://host.docker.internal:5000` when running the app in a container.
 - `UPLOAD_FOLDER`: folder where uploaded files are stored. Correctomatic doesn't need access to this folder (it makes a copy of the file), so you can set it to any value.
@@ -61,11 +61,11 @@ You will also need to mount the LTI configuration directory, with the correctoma
 Example of running the container:
 ```bash
 docker run --rm --name correctomatic-app \
-    -e POSTGRES_USER=correctomatic \
-    -e POSTGRES_PASSWORD=correctomatic \
-    -e POSTGRES_HOST=host.docker.internal \
-    -e POSTGRES_PORT=5432 \
-    -e POSTGRES_DB=correctomatic \
+    -e DB_USER=correctomatic \
+    -e DB_PASSWORD=correctomatic \
+    -e DB_HOST=host.docker.internal \
+    -e DB_PORT=5432 \
+    -e DB_NAME=correctomatic \
     -e CORRECTOMATIC_API_SERVER=http://host.docker.internal:8080 \
     -e CALLBACK_HOST=http://host.docker.internal:5000 \
     -e UPLOAD_FOLDER=/uploads \
