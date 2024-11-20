@@ -6,6 +6,7 @@ from flask_caching import Cache
 
 from .extensions import db, get_connection_string
 from .errors import register_errors
+from .config import configurations
 
 def set_log_level(app):
     DEFAULT_LOG_LEVEL = 'WARNING'
@@ -19,12 +20,7 @@ def set_log_level(app):
 
     return app
 
-def create_app():
-    app = Flask(__name__)
-
-    app.secret_key = os.getenv('FLASK_SECRET_KEY', os.urandom(24))
-    set_log_level(app)
-
+def add_request_id_to_log(app):
     # Generate a request ID for each incoming request
     @app.before_request
     def generate_request_id():
@@ -37,6 +33,15 @@ def create_app():
         app.logger.info(f"Request ID: {g.request_id} finished")
         return response
 
+
+def create_app(environment='development'):
+    app = Flask(__name__)
+
+    app.config.from_object(configurations[environment])
+
+    set_log_level(app)
+    add_request_id_to_log(app)
+
     # ----------------------------------------
     # Debugging log level
     # ----------------------------------------
@@ -47,20 +52,6 @@ def create_app():
     # Set up caching configuration
     app.config['CACHE_TYPE'] = 'simple'  # or 'filesystem', 'redis', 'memcached', etc.
     app.config['CACHE_DEFAULT_TIMEOUT'] = 300  # Optional: set default cache timeout (in seconds)
-
-    app.config['SQLALCHEMY_DATABASE_URI'] = get_connection_string()
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-    app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', os.path.join(app.root_path, "..", "uploads"))
-    app.config['CALLBACK_HOST'] = os.getenv('CALLBACK_HOST', 'http://localhost:5000')
-    app.config['CORRECTOMATIC_API_SERVER'] = os.getenv('CORRECTOMATIC_API_SERVER')
-    app.config['DEFAULT_ASSIGNMENT'] = os.getenv('DEFAULT_ASSIGNMENT', 'correction-test-1')
-
-    # SQLAlchemy pool configuration
-    app.config['SQLALCHEMY_POOL_SIZE'] = 10         # Number of connections to keep in the pool
-    app.config['SQLALCHEMY_POOL_TIMEOUT'] = 5      # Timeout in seconds to get a connection from the pool
-    app.config['SQLALCHEMY_POOL_RECYCLE'] = 3600    # Time in seconds to recycle a connection
-    app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20      # Number of connections to allow beyond the pool size
 
     # Validations before running the app
     if not os.path.exists(app.config['UPLOAD_FOLDER']):

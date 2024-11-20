@@ -56,7 +56,9 @@ To run the container, you need to set the following environment variables:
 - `CALLBACK_HOST`: host and port of this app from the correctomatic viewpoint. You will probably need to set this to `http://host.docker.internal:5000` when running the app in a container.
 - `UPLOAD_FOLDER`: folder where uploaded files are stored. Correctomatic doesn't need access to this folder (it makes a copy of the file), so you can set it to any value.
 
+**TODO: obsolete, it's in the DB now**
 You will also need to mount the LTI configuration directory, with the correctomatic.json LTI configuration files and the private and public keys. Take in mind that the paths in the configuration file should be from the viewpoint of the app container.
+**TODO: obsolete, it's in the DB now**
 
 Example of running the container:
 ```bash
