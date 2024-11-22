@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
 
 def connection_string(db_name, user, password, host, port = 5432,):
     return f'postgresql+psycopg://{user}:{password}@{host}:{port}/{db_name}'
@@ -28,11 +31,11 @@ class DevelopmentConfig(BaseConfig):
     @classmethod
     def initialize(cls):
         # Must match the ones defined in docker-init-db.sh
-        cls.DB_NAME = "inscripciones_dev"
-        cls.DB_USER = "dev_user"
-        cls.DB_PASSWORD = "dev_password"
-        cls.DB_HOST = "localhost"
-        cls.DB_PORT = "5432"
+        cls.DB_NAME = os.getenv("DB_NAME", "correctomatic_app")
+        cls.DB_USER = os.getenv("DB_USER")
+        cls.DB_PASSWORD = os.getenv("DB_PASSWORD")
+        cls.DB_HOST = os.getenv("DB_HOST")
+        cls.DB_PORT = os.getenv("DB_PORT", "5432")
 
         return super().initialize()
 
@@ -59,7 +62,7 @@ class ProductionConfig(BaseConfig):
 
     @classmethod
     def initialize(cls):
-        cls.DB_NAME = os.getenv("DB_NAME", "inscripciones")
+        cls.DB_NAME = os.getenv("DB_NAME", "correctomatic_app")
         cls.DB_USER = os.getenv("DB_USER")
         cls.DB_PASSWORD = os.getenv("DB_PASSWORD")
         cls.DB_HOST = os.getenv("DB_HOST")

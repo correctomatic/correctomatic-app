@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -6,7 +7,8 @@ from sqlalchemy import pool
 from alembic import context
 
 from dotenv import load_dotenv
-from app.extensions import db, get_connection_string
+from app.extensions import db
+from app.config import configurations
 from app.models import *
 
 load_dotenv(override=True)
@@ -20,7 +22,8 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option('sqlalchemy.url', get_connection_string())
+current_config = configurations[os.getenv("FLASK_ENV", "development")]
+config.set_main_option('sqlalchemy.url', current_config.SQLALCHEMY_DATABASE_URI)
 
 # add your model's MetaData object here
 # for 'autogenerate' support

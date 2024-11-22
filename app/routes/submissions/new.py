@@ -9,7 +9,7 @@ from app.models import Submission
 from app.extensions import db
 from . import bp
 from .utils import require_launch_data
-from .correctomatic import send_correction_request
+from ...lib.correctomatic import send_correction_request
 
 def unique_filename(filename):
     unique_id = uuid.uuid4().hex
