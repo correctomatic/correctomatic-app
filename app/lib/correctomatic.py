@@ -1,4 +1,3 @@
-
 import os
 import requests
 from flask import current_app, url_for
@@ -9,6 +8,7 @@ def send_correction_request(assignment_id, submission_id, filename, custom_param
     callback_host = current_app.config['CALLBACK_HOST']
     upload_folder = current_app.config['UPLOAD_FOLDER']
     api_server = current_app.config['CORRECTOMATIC_API_SERVER']
+    api_key = current_app.config['CORRECTOMATIC_API_KEY']
     file_path = os.path.join(upload_folder, filename)
 
     if not os.path.exists(file_path):
@@ -28,10 +28,11 @@ def send_correction_request(assignment_id, submission_id, filename, custom_param
             if key != 'assignment_id':  # Excluir 'assignment_id'
                 files.append(('param', (None, f"{key}={value}")))
 
+        headers = { 'x-api-key': api_key}
         current_app.logger.debug(f"Sending request to {api_server}/grade with files: {files}")
-        response = requests.post(f'{api_server}/grade', files=files, timeout=5)
+        response = requests.post(f'{api_server}/grade', files=files, headers=headers, timeout=5)
 
-    if response.status_code != 200:
+    if response.status_code not in [200, 400]:
         raise Exception(f'Error: {response.status_code} - {response.text}')
 
     response_data = response.json()

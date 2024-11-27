@@ -18,6 +18,7 @@ class BaseConfig:
     UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", os.path.join(os.path.dirname(__file__), "..", "uploads"))
     CALLBACK_HOST = os.getenv("CALLBACK_HOST", "http://localhost:5000")
     CORRECTOMATIC_API_SERVER = os.getenv("CORRECTOMATIC_API_SERVER")
+    CORRECTOMATIC_API_KEY = os.getenv("CORRECTOMATIC_API_KEY")
 
     @classmethod
     def initialize(cls):

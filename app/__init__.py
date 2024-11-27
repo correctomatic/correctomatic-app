@@ -87,6 +87,8 @@ def create_app(environment='development'):
         raise ValueError("Environment variable 'CALLBACK_HOST' is required")
     if not app.config['CORRECTOMATIC_API_SERVER']:
         raise ValueError("Environment variable 'CORRECTOMATIC_API_SERVER' is required")
+    if not app.config['CORRECTOMATIC_API_KEY']:
+        raise ValueError("Environment variable 'CORRECTOMATIC_API_KEY' is required")
 
     # Must be done after setting up the configuration
     cache = Cache(app)
